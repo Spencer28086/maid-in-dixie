@@ -35,3 +35,27 @@ model Settings {
   venmoHandle     String?
   zelleEmail      String?
 }
+
+model Booking {
+  id              String   @id @default(uuid())
+  name            String
+  email           String
+  phone           String
+  address         String?
+  notes           String?
+  selectedDate    String
+  selectedSlot    String
+  addOns          String[]
+  photos          String[]
+
+  status          String
+  paymentStatus   String
+
+  totalEstimate   Float?
+  depositAmount   Float?
+
+  reminderSent    Boolean  @default(false)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

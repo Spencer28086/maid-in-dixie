@@ -22,12 +22,10 @@ export async function sendEmail({
     const resend = getResend();
 
     return resend.emails.send({
-        from: "Maid in Dixie <onboarding@resend.dev>",
+        from: "Maid in Dixie Cleaning Services <spencerechnologygroup@gmail.com>",
         to,
         subject,
         html,
-
-        // 🔥 THIS IS THE KEY LINE
         replyTo: "maidindixiecleaningservices@gmail.com",
     });
 }

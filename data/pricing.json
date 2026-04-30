@@ -1,0 +1,76 @@
+{
+  "services": [
+    {
+      "name": "Standard Cleaning",
+      "price": 100,
+      "subtitle": "Routine Care",
+      "description": "Perfect for keeping your home fresh and tidy.",
+      "features": [
+        "Dusting & surfaces",
+        "Kitchen wipe-down",
+        "Bathroom cleaning",
+        "Floor care"
+      ],
+      "image": "/images/services/basic.jpg"
+    },
+    {
+      "name": "Deep Cleaning",
+      "customQuote": true,
+      "subtitle": "Top-to-Bottom",
+      "description": "A complete reset for your entire home.",
+      "features": [
+        "Baseboards & detail work",
+        "Deep kitchen clean",
+        "Scrubbed bathrooms",
+        "Hard-to-reach areas"
+      ],
+      "image": "/images/services/deep.jpg"
+    },
+    {
+      "name": "Move-In / Move-Out Cleaning",
+      "customQuote": true,
+      "subtitle": "Fresh Start",
+      "description": "Perfect for moving in or preparing a home for the next resident.",
+      "features": [
+        "Empty home deep clean",
+        "Cabinets & appliances",
+        "Floors & baseboards",
+        "Move-ready finish"
+      ],
+      "image": "/images/services/move.jpg",
+      "price": 300
+    },
+    {
+      "name": "RV Cleaning",
+      "customQuote": true,
+      "subtitle": "On-the-Road Care",
+      "description": "Keep your RV spotless and comfortable for every trip.",
+      "features": [
+        "Interior wipe-down",
+        "Kitchen & bathroom cleaning",
+        "Surface sanitation",
+        "Compact space detailing"
+      ],
+      "image": "/images/services/rv.jpg",
+      "price": 300
+    }
+  ],
+  "addons": [
+    {
+      "name": "Window Cleaning (Interior)",
+      "price": 50
+    },
+    {
+      "name": "Deep Bathroom Scrub",
+      "price": 75
+    },
+    {
+      "name": "Laundry Service",
+      "price": 40
+    },
+    {
+      "name": "Pet Hair Removal",
+      "price": 60
+    }
+  ]
+}

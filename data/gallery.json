@@ -1,0 +1,86 @@
+{
+  "data": [
+    {
+      "category": "Kitchen",
+      "items": [
+        {
+          "type": "pair",
+          "before": "/uploads/1777493975995-33p8mfi-fridge-1-before.jpg",
+          "after": "/uploads/1777493980628-xf856f4-fridge-1-after.jpg"
+        },
+        {
+          "type": "pair",
+          "before": "/uploads/1777493990716-g4aiqiu-fridge-2-before.jpg",
+          "after": "/uploads/1777493994964-9zkrklw-fridge-2-after.jpg"
+        },
+        {
+          "type": "pair",
+          "before": "/uploads/1777494006052-x8u4f4u-kitchen-1-before.jpg",
+          "after": "/uploads/1777494010147-arz8p8e-kitchen-1-after.jpg"
+        },
+        {
+          "type": "pair",
+          "before": "/uploads/1777494020249-cytik7q-kitchen-2-before.jpg",
+          "after": "/uploads/1777494024672-3vd3pyc-kitchen-2-after.jpg"
+        }
+      ]
+    },
+    {
+      "category": "Living Room",
+      "items": [
+        {
+          "type": "single",
+          "image": "/uploads/1777495469888-iyk8mdt-living-room-after-cleaning-organized-modern-space-maid-in-dixie.jpg"
+        },
+        {
+          "type": "single",
+          "image": "/uploads/1777495517325-xcrrp19-maid-in-dixie-living-room-clean-natural-light.jpg"
+        }
+      ]
+    },
+    {
+      "category": "Bathroom",
+      "items": [
+        {
+          "type": "pair",
+          "before": "/uploads/1777494827427-uoezn0a-bathroom-1-before.jpg",
+          "after": "/uploads/1777494831466-m6m8ekz-bathroom-1-after.jpg"
+        },
+        {
+          "type": "single",
+          "image": "/uploads/1777494874553-5dg8zci-bathroom-2-before-after.jpg"
+        },
+        {
+          "type": "single",
+          "image": "/uploads/1777494883102-z5r3vek-bathroom-3-before-after.jpg"
+        },
+        {
+          "type": "single",
+          "image": "/uploads/1777495378034-png9bgu-bathroom-after-cleaning-granite-counter-modern-vanity-maid-in-dixie.jpg"
+        }
+      ]
+    },
+    {
+      "category": "Dining Room",
+      "items": [
+        {
+          "type": "single",
+          "image": "/uploads/1777495553149-m33uiap-dining-room-after-cleaning-clean-floor-empty-space-maid-in-dixie.jpg"
+        },
+        {
+          "type": "single",
+          "image": "/uploads/1777495615445-o5cbwwr-dining-room-after.jpg"
+        }
+      ]
+    },
+    {
+      "category": "Bedroom",
+      "items": [
+        {
+          "type": "single",
+          "image": "/uploads/1777495693538-7bw6bvd-bedroom-carpet-after-cleaning-fresh-lines-vacuum-finish-maid-in-dixie.jpg"
+        }
+      ]
+    }
+  ]
+}

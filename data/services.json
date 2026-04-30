@@ -1,0 +1,28 @@
+[
+  {
+    "title": "Standard Cleaning",
+    "subtitle": "Routine Care",
+    "desc": "Perfect for keeping your home fresh and tidy.",
+    "features": [
+      "Dusting & surfaces",
+      "Kitchen wipe-down",
+      "Bathroom cleaning",
+      "Floor care"
+    ],
+    "price": "Starting at $100",
+    "image": "/images/services/basic.jpg"
+  },
+  {
+    "title": "Deep Cleaning",
+    "subtitle": "Top-to-Bottom",
+    "desc": "A complete reset for your entire home.",
+    "features": [
+      "Baseboards & detail work",
+      "Deep kitchen clean",
+      "Scrubbed bathrooms",
+      "Hard-to-reach areas"
+    ],
+    "price": "Custom Quote",
+    "image": "/images/services/deep.jpg"
+  }
+]

@@ -227,9 +227,11 @@ export async function PATCH(req: Request) {
       });
     }
 
-    const normalizedStatus = String(status).toUpperCase();
+    const normalizedStatus =
+      typeof status === "string" ? status.toUpperCase() : null;
 
     if (
+      normalizedStatus &&
       !["NEW", "APPROVED", "DECLINED", "PENDING_PAYMENT", "PENDING_REVIEW"].includes(
         normalizedStatus
       )
@@ -344,7 +346,9 @@ export async function PATCH(req: Request) {
       });
     }
 
-    booking.status = normalizedStatus as BookingStatus;
+    if (normalizedStatus) {
+      booking.status = normalizedStatus as BookingStatus;
+    }
 
     if (typeof totalEstimate === "number") {
       booking.totalEstimate = totalEstimate;

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
@@ -16,6 +18,8 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
 
+  console.log("📦 GET BOOKINGS:", bookings);
+
   return NextResponse.json({
     ok: true,
     bookings,
@@ -25,6 +29,8 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+
+    console.log("🔥 INCOMING BOOKING BODY:", body);
 
     const {
       name,
@@ -39,32 +45,48 @@ export async function POST(req: Request) {
     } = body;
 
     if (!name || !email || !phone || !selectedDate || !selectedSlot) {
+      console.log("❌ VALIDATION FAILED");
       return NextResponse.json(
         { ok: false, message: "Missing required booking information." },
         { status: 400 }
       );
     }
 
-    const booking = await prisma.booking.create({
-      data: {
-        name,
-        email,
-        phone,
-        address: address || "",
-        notes: notes || "",
-        selectedDate,
-        selectedSlot,
-        addOns: Array.isArray(addOns) ? addOns : [],
-        photos: Array.isArray(photos) ? photos : [],
-        reminderSent: false,
+    console.log("🧠 ATTEMPTING TO SAVE BOOKING...");
 
-        status: "PENDING_REVIEW",
-        paymentStatus: "UNPAID",
+    let booking;
 
-        totalEstimate: null,
-        depositAmount: null,
-      },
-    });
+    try {
+      booking = await prisma.booking.create({
+        data: {
+          name,
+          email,
+          phone,
+          address: address || "",
+          notes: notes || "",
+          selectedDate,
+          selectedSlot,
+          addOns: Array.isArray(addOns) ? addOns : [],
+          photos: Array.isArray(photos) ? photos : [],
+          reminderSent: false,
+
+          status: "PENDING_REVIEW",
+          paymentStatus: "UNPAID",
+
+          totalEstimate: null,
+          depositAmount: null,
+        },
+      });
+
+      console.log("✅ BOOKING SAVED SUCCESSFULLY:", booking);
+    } catch (dbErr) {
+      console.error("❌ PRISMA CREATE FAILED:", dbErr);
+
+      return NextResponse.json(
+        { ok: false, message: "Database save failed." },
+        { status: 500 }
+      );
+    }
 
     try {
       // Client confirmation
@@ -97,8 +119,10 @@ export async function POST(req: Request) {
           </div>
         `,
       });
+
+      console.log("📧 EMAILS SENT");
     } catch (err) {
-      console.error("Email failed but booking saved:", err);
+      console.error("⚠️ Email failed but booking saved:", err);
     }
 
     return NextResponse.json({
@@ -107,7 +131,7 @@ export async function POST(req: Request) {
       booking,
     });
   } catch (err) {
-    console.error(err);
+    console.error("💥 POST ROUTE CRASH:", err);
 
     return NextResponse.json(
       { ok: false, message: "Unable to save booking request." },
@@ -121,6 +145,8 @@ export async function PATCH(req: Request) {
     const body = await req.json();
     const { id, status, paymentStatus, totalEstimate, depositAmount } = body;
 
+    console.log("✏️ PATCH REQUEST:", body);
+
     const booking = await prisma.booking.findUnique({
       where: { id },
     });
@@ -132,7 +158,6 @@ export async function PATCH(req: Request) {
       );
     }
 
-    // Payment logic
     if (paymentStatus === "PAID") {
       const updated = await prisma.booking.update({
         where: { id },
@@ -187,7 +212,7 @@ export async function PATCH(req: Request) {
       booking: updated,
     });
   } catch (err) {
-    console.error(err);
+    console.error("💥 PATCH ERROR:", err);
 
     return NextResponse.json(
       { ok: false, message: "Unable to update booking." },
@@ -201,6 +226,8 @@ export async function DELETE(req: Request) {
     const body = await req.json();
     const { id } = body;
 
+    console.log("🗑️ DELETE REQUEST:", id);
+
     await prisma.booking.delete({
       where: { id },
     });
@@ -210,7 +237,7 @@ export async function DELETE(req: Request) {
       message: "Booking deleted.",
     });
   } catch (err) {
-    console.error(err);
+    console.error("💥 DELETE ERROR:", err);
 
     return NextResponse.json(
       { ok: false, message: "Unable to delete booking." },

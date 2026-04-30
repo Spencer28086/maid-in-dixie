@@ -159,7 +159,7 @@ export async function POST(req: Request) {
       });
 
       await sendEmail({
-        to: "spencerd892@gmail.com",
+        to: "spencertechnologygroup@gmail.com",
         subject: "🚨 New Booking Request - Maid in Dixie",
         html: `
       <div style="font-family: Arial, sans-serif; padding: 20px;">

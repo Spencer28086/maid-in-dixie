@@ -128,22 +128,6 @@ export default function BookingPage() {
       const fd = new FormData();
       photos.forEach((f) => fd.append("files", f));
 
-      photos.forEach((_, i) => {
-        let progress = 0;
-
-        const interval = setInterval(() => {
-          progress += Math.random() * 20;
-
-          setUploadProgress((prev) => {
-            const copy = [...prev];
-            copy[i] = Math.min(progress, 95);
-            return copy;
-          });
-
-          if (progress >= 95) clearInterval(interval);
-        }, 200);
-      });
-
       try {
         const res = await fetch("/api/upload", {
           method: "POST",
@@ -155,9 +139,7 @@ export default function BookingPage() {
         if (!data.ok) {
           console.warn("⚠️ Upload failed, continuing without photos");
           alert("Photos could not be uploaded, but your request will still be submitted.");
-          setUploadProgress((prev) => prev.map(() => 0));
         } else {
-          setUploadProgress((prev) => prev.map(() => 100));
           uploadedPhotos = data.files;
         }
       } catch (err) {
@@ -280,6 +262,27 @@ export default function BookingPage() {
               <p className="text-pink-600 font-bold">Deposit: ${deposit}</p>
             </Section>
           )}
+
+          {/* ✅ AGREEMENT FIX */}
+          <div className="flex gap-3 items-center text-sm">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={() => setAgreed(!agreed)}
+            />
+
+            <span>
+              I agree to the{" "}
+              <a
+                href="/policies"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#d95f91] underline font-medium"
+              >
+                policies
+              </a>
+            </span>
+          </div>
 
           <button
             disabled={!agreed}

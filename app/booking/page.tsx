@@ -231,6 +231,36 @@ export default function BookingPage() {
             </Section>
           </div>
 
+          {/* ✅ ADD-ONS SECTION RESTORED */}
+          <Section title="5. Add-On Services">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {addOnsList.map((addon, i) => {
+                const selected = selectedAddOns.includes(addon);
+
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => {
+                      setSelectedAddOns((prev) =>
+                        selected
+                          ? prev.filter((a) => a !== addon)
+                          : [...prev, addon]
+                      );
+                    }}
+                    className={`p-3 border rounded text-sm transition
+                      ${selected
+                        ? "bg-[#d95f91] text-white border-[#d95f91]"
+                        : "bg-white hover:bg-gray-100"
+                      }`}
+                  >
+                    {addon}
+                  </button>
+                );
+              })}
+            </div>
+          </Section>
+
           <Section title="7. Upload Photos">
             <div className="border-2 border-dashed border-[#d95f91] rounded-xl p-6 text-center">
               <input
@@ -263,7 +293,6 @@ export default function BookingPage() {
             </Section>
           )}
 
-          {/* ✅ AGREEMENT FIX */}
           <div className="flex gap-3 items-center text-sm">
             <input
               type="checkbox"

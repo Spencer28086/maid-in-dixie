@@ -1,21 +1,6 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 import { sendEmail } from "@/lib/email";
-
-const BOOKINGS_FILE = path.join(
-  process.cwd(),
-  "data",
-  "booking-requests.json",
-);
-
-function readBookings() {
-  try {
-    return JSON.parse(fs.readFileSync(BOOKINGS_FILE, "utf-8"));
-  } catch {
-    return [];
-  }
-}
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
@@ -24,36 +9,42 @@ export async function POST(req: Request) {
     if (!bookingId) {
       return NextResponse.json(
         { ok: false, message: "Missing bookingId" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
-    const bookings = readBookings();
-    const booking = bookings.find((b: any) => b.id === bookingId);
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+    });
 
     if (!booking) {
       return NextResponse.json(
         { ok: false, message: "Booking not found" },
-        { status: 404 },
+        { status: 404 }
+      );
+    }
+
+    if (!booking.email) {
+      return NextResponse.json(
+        { ok: false, message: "Booking missing email" },
+        { status: 400 }
       );
     }
 
     if (!booking.depositAmount) {
       return NextResponse.json(
         { ok: false, message: "Deposit not set" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
-    const paymentLink = `http://localhost:3002/booking/payment/${booking.id}`;
+    const paymentLink = `https://www.maidindixiecleaningservices.com/booking/payment/${booking.id}`;
 
-    // ✅ DEBUG LOG (IMPORTANT)
     console.log("📧 Sending deposit email to:", booking.email);
     console.log("💰 Deposit:", booking.depositAmount);
-    console.log("🔗 Link:", paymentLink);
 
     await sendEmail({
-      to: booking.email, // ⚠️ STILL WILL ROUTE TO YOUR RESEND EMAIL (DEV MODE)
+      to: booking.email,
       subject: "Your Maid in Dixie Deposit is Ready",
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px;">
@@ -79,15 +70,13 @@ export async function POST(req: Request) {
       ok: true,
       message: "Deposit email sent",
     });
+
   } catch (err) {
     console.error("❌ SEND DEPOSIT ERROR:", err);
 
     return NextResponse.json(
-      {
-        ok: false,
-        message: "Email failed to send",
-      },
-      { status: 500 },
+      { ok: false, message: "Email failed to send" },
+      { status: 500 }
     );
   }
 }

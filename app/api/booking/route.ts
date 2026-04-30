@@ -89,7 +89,7 @@ export async function POST(req: Request) {
     }
 
     try {
-      // Client confirmation
+      // Client confirmation (still exists = redundancy)
       await sendEmail({
         to: booking.email,
         subject: "Booking Request Received – Maid in Dixie Cleaning Services",
@@ -104,9 +104,10 @@ export async function POST(req: Request) {
         `,
       });
 
-      // Admin notification
+      // Admin notification + BCC to client 👇
       await sendEmail({
         to: "spencertechnologygroup@gmail.com",
+        bcc: [booking.email], // 🔥 THIS IS THE KEY ADD
         subject: "🚨 New Booking Request - Maid in Dixie",
         html: `
           <div style="font-family: Arial; padding:20px;">
@@ -120,7 +121,7 @@ export async function POST(req: Request) {
         `,
       });
 
-      console.log("📧 EMAILS SENT");
+      console.log("📧 EMAILS SENT (ADMIN + CLIENT BCC)");
     } catch (err) {
       console.error("⚠️ Email failed but booking saved:", err);
     }

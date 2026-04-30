@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { sendEmail } from "@/lib/email";
+import { prisma } from "@/lib/prisma";
 
 const SITE_CONTENT_FILE = path.join(
   process.cwd(),
@@ -17,19 +18,6 @@ function readSiteContent() {
   }
 }
 
-const BOOKINGS_FILE = path.join(
-  process.cwd(),
-  "data",
-  "booking-requests.json"
-);
-
-function readBookings() {
-  try {
-    return JSON.parse(fs.readFileSync(BOOKINGS_FILE, "utf-8"));
-  } catch {
-    return [];
-  }
-}
 
 export async function POST(req: Request) {
   try {
@@ -42,14 +30,25 @@ export async function POST(req: Request) {
       );
     }
 
-    const bookings = readBookings();
+
+
     const site = readSiteContent();
-    const booking = bookings.find((b: any) => b.id === bookingId);
+
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+    });
 
     if (!booking) {
       return NextResponse.json(
         { ok: false, message: "Booking not found" },
         { status: 404 }
+      );
+    }
+
+    if (!booking.email) {
+      return NextResponse.json(
+        { ok: false, message: "Booking missing email" },
+        { status: 400 }
       );
     }
 
@@ -165,7 +164,7 @@ export async function POST(req: Request) {
           <tr>
             <td style="padding:6px 0;font-weight:bold;">Remaining Balance</td>
             <td style="text-align:right;font-weight:bold;">
-              $${(booking.totalEstimate || 0) - (booking.depositAmount || 0)}
+              $${remaining}
             </td>
           </tr>
         </table>

@@ -152,6 +152,30 @@ export async function POST(req: Request) {
       `,
     });
 
+    await sendEmail({
+      to: process.env.NOTIFICATION_EMAIL || "maidindixiecleaningservices@gmail.com",
+      subject: "🚨 New Booking Request - Maid in Dixie",
+      html: `
+    <div style="font-family: Arial, sans-serif; padding: 20px;">
+      <h2>New Booking Request</h2>
+
+      <p><strong>Name:</strong> ${booking.name}</p>
+      <p><strong>Email:</strong> ${booking.email}</p>
+      <p><strong>Phone:</strong> ${booking.phone}</p>
+      <p><strong>Address:</strong> ${booking.address}</p>
+
+      <p><strong>Date:</strong> ${booking.selectedDate}</p>
+      <p><strong>Time:</strong> ${booking.selectedSlot}</p>
+
+      <p><strong>Add-ons:</strong> ${booking.addOns?.length ? booking.addOns.join(", ") : "None"
+        }</p>
+
+      <p><strong>Notes:</strong></p>
+      <p>${booking.notes || "None"}</p>
+    </div>
+  `,
+    });
+
     return NextResponse.json({
       ok: true,
       message: "Booking request submitted.",

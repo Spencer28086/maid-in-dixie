@@ -22,7 +22,7 @@ export async function sendEmail({
     const resend = getResend();
 
     return resend.emails.send({
-        from: "Maid in Dixie Cleaning Services <noreply@yourdomain.com>",
+        from: "Maid in Dixie <onboarding@resend.dev>",
         to,
         subject,
         html,

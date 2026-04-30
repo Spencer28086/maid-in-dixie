@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function PaymentSuccessPage() {
+export const dynamic = "force-dynamic";
+
+function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const bookingId = searchParams.get("bookingId");
 
@@ -78,19 +80,16 @@ export default function PaymentSuccessPage() {
     <section className="min-h-screen bg-[#fff7f8] flex items-center justify-center px-4">
       <div className="bg-white rounded-3xl shadow-xl border border-[#f3d1d8] p-10 max-w-lg w-full text-center space-y-6">
 
-        {/* TITLE */}
         <h1 className="text-3xl font-serif text-[#2d1b21]">
           Payment Confirmation
         </h1>
 
-        {/* LOADING */}
         {loading && (
           <p className="text-gray-500">
             Confirming your payment...
           </p>
         )}
 
-        {/* ERROR */}
         {!loading && error && (
           <div className="space-y-3">
             <p className="text-red-500 font-semibold">
@@ -102,7 +101,6 @@ export default function PaymentSuccessPage() {
           </div>
         )}
 
-        {/* SUCCESS */}
         {!loading && confirmed && (
           <div className="space-y-4">
             <p className="text-[#4a2b33] text-lg">
@@ -119,7 +117,6 @@ export default function PaymentSuccessPage() {
           </div>
         )}
 
-        {/* BUTTON */}
         {!loading && confirmed && (
           <a
             href="/"
@@ -130,5 +127,13 @@ export default function PaymentSuccessPage() {
         )}
       </div>
     </section>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }

@@ -85,9 +85,16 @@ export default function GalleryAdminPage() {
         setSections(updated);
     }
 
-    function changeType(sectionIndex: number, itemIndex: number, type: string) {
+    function changeType(
+        sectionIndex: number,
+        itemIndex: number,
+        type: "single" | "pair" | "combined"
+    ) {
         const updated = [...sections];
-        updated[sectionIndex].items[itemIndex] = { type };
+        updated[sectionIndex].items[itemIndex] = {
+            ...updated[sectionIndex].items[itemIndex],
+            type,
+        };
         setSections(updated);
     }
 
@@ -156,7 +163,13 @@ export default function GalleryAdminPage() {
                                     {/* TYPE SELECT */}
                                     <select
                                         value={item.type || "single"}
-                                        onChange={(e) => changeType(i, j, e.target.value)}
+                                        onChange={(e) =>
+                                            changeType(
+                                                i,
+                                                j,
+                                                e.target.value as "single" | "pair" | "combined"
+                                            )
+                                        }
                                         className="border p-1 w-full"
                                     >
                                         <option value="single">Single Image</option>

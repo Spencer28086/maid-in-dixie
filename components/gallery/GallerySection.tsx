@@ -3,13 +3,28 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import BeforeAfterSlider from "./BeforeAfterSlider";
-import {
-  beforeAfterPairs,
-  galleryCategories,
-  galleryImages,
-  type GalleryCategory,
-  type GalleryImage,
-} from "./galleryData";
+import { galleryCategories, galleryImages } from "./galleryData";
+
+type GalleryCategory = string;
+
+type GalleryImage = {
+  src: string;
+  alt: string;
+  title: string;
+  category: string;
+};
+
+type BeforeAfterPair = {
+  id: string;
+  beforeSrc: string;
+  afterSrc: string;
+  beforeAlt: string;
+  afterAlt: string;
+  title: string;
+  description: string;
+};
+
+const beforeAfterPairs: BeforeAfterPair[] = [];
 
 type LightboxImage = {
   src: string;
@@ -26,7 +41,10 @@ export default function GallerySection() {
 
   const filteredImages = useMemo(() => {
     if (activeCategory === "Before & After") return [];
-    return galleryImages.filter((image) => image.category === activeCategory);
+
+    return galleryImages.filter(
+      (image: GalleryImage) => image.category === activeCategory
+    );
   }, [activeCategory]);
 
   return (
@@ -58,7 +76,7 @@ export default function GallerySection() {
         </div>
 
         <div className="mx-auto mt-10 flex max-w-4xl flex-wrap justify-center gap-3">
-          {galleryCategories.map((category) => {
+          {galleryCategories.map((category: GalleryCategory) => {
             const active = category === activeCategory;
 
             return (

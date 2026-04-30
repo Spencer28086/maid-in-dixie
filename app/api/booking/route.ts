@@ -21,6 +21,7 @@ type BookingRequest = {
   selectedDate: string;
   selectedSlot: string;
   addOns?: string[];
+  photos?: string[];
 
   status: BookingStatus;
   paymentStatus: PaymentStatus;

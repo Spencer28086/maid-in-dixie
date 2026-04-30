@@ -59,7 +59,7 @@ export async function POST(req: Request) {
       quickPay: {
         name: "Cleaning Deposit",
         priceMoney: {
-          amount: amountInCents, // ❌ NO BigInt
+          amount: BigInt(amountInCents), // ❌ NO BigInt
           currency: "USD",
         },
         locationId,

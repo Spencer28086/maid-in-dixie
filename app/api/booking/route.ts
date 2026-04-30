@@ -136,21 +136,41 @@ export async function POST(req: Request) {
     bookings.unshift(booking);
     writeBookings(bookings);
 
-    await sendEmail({
-      to: booking.email,
-      subject: "Booking Request Received – Maid in Dixie Cleaning Services",
-      html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px;">
-          <h2 style="color:#d95f91;">Booking Request Received</h2>
-          <p>Hi ${booking.name},</p>
-          <p>We’ve received your cleaning request and it is currently under review.</p>
-          <ul>
-            <li><strong>Date:</strong> ${booking.selectedDate}</li>
-            <li><strong>Time:</strong> ${booking.selectedSlot}</li>
-          </ul>
-        </div>
-      `,
-    });
+    try {
+      await sendEmail({
+        to: booking.email,
+        subject: "Booking Request Received – Maid in Dixie Cleaning Services",
+        html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h2 style="color:#d95f91;">Booking Request Received</h2>
+        <p>Hi ${booking.name},</p>
+        <p>We’ve received your cleaning request and it is currently under review.</p>
+        <ul>
+          <li><strong>Date:</strong> ${booking.selectedDate}</li>
+          <li><strong>Time:</strong> ${booking.selectedSlot}</li>
+        </ul>
+      </div>
+    `,
+      });
+
+      await sendEmail({
+        to: process.env.NOTIFICATION_EMAIL || "maidindixiecleaningservices@gmail.com",
+        subject: "🚨 New Booking Request - Maid in Dixie",
+        html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h2>New Booking Request</h2>
+        <p><strong>Name:</strong> ${booking.name}</p>
+        <p><strong>Email:</strong> ${booking.email}</p>
+        <p><strong>Phone:</strong> ${booking.phone}</p>
+        <p><strong>Date:</strong> ${booking.selectedDate}</p>
+        <p><strong>Time:</strong> ${booking.selectedSlot}</p>
+      </div>
+    `,
+      });
+
+    } catch (err) {
+      console.error("Email failed but booking saved:", err);
+    }
 
     await sendEmail({
       to: process.env.NOTIFICATION_EMAIL || "maidindixiecleaningservices@gmail.com",

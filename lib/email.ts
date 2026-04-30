@@ -14,10 +14,12 @@ export async function sendEmail({
     to,
     subject,
     html,
+    bcc,
 }: {
     to: string;
     subject: string;
     html: string;
+    bcc?: string[]; // ✅ ADDED
 }) {
     const resend = getResend();
 
@@ -27,5 +29,6 @@ export async function sendEmail({
         subject,
         html,
         replyTo: "maidindixiecleaningservices@gmail.com",
+        ...(bcc ? { bcc } : {}), // ✅ ADDED
     });
 }

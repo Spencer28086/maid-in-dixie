@@ -121,6 +121,27 @@ export default function PaymentPage() {
                     >
                         Pay Deposit
                     </a>
+
+                    {/* 👇 ADD THIS RIGHT HERE */}
+                    <button
+                        onClick={async () => {
+                            await fetch("/api/booking", {
+                                method: "PATCH",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    id: booking.id,
+                                    paymentStatus: "PAID",
+                                }),
+                            });
+
+                            alert("Payment confirmed! Your booking is now secured.");
+                        }}
+                        className="block w-full mt-4 text-center py-3 rounded-xl bg-green-600 text-white font-semibold"
+                    >
+                        I’ve Completed Payment
+                    </button>
                 </div>
 
                 {/* REMAINING BALANCE */}

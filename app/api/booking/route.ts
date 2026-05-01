@@ -89,39 +89,61 @@ export async function POST(req: Request) {
     }
 
     try {
-      // Client confirmation (still exists = redundancy)
+      // ==========================
+      // 1. CUSTOMER EMAIL
+      // ==========================
       await sendEmail({
         to: booking.email,
-        subject: "Booking Request Received – Maid in Dixie Cleaning Services",
+        subject: "We Received Your Booking Request – Maid in Dixie",
         html: `
-          <div style="font-family: Arial; padding:20px;">
-            <h2 style="color:#d95f91;">Booking Request Received</h2>
-            <p>Hi ${booking.name},</p>
-            <p>Your request is under review.</p>
-            <p><strong>Date:</strong> ${booking.selectedDate}</p>
-            <p><strong>Time:</strong> ${booking.selectedSlot}</p>
-          </div>
-        `,
+    <div style="font-family: Arial; padding:20px;">
+      <h2 style="color:#d95f91;">You're Booked (Almost 😉)</h2>
+
+      <p>Hi ${booking.name},</p>
+
+      <p>We received your cleaning request and it's currently under review.</p>
+
+      <p><strong>Date:</strong> ${booking.selectedDate}</p>
+      <p><strong>Time:</strong> ${booking.selectedSlot}</p>
+
+      <p>We’ll review your request shortly and send over your deposit link.</p>
+
+      <p style="margin-top:20px;">— Maid in Dixie Cleaning Services</p>
+    </div>
+  `,
       });
 
-      // Admin notification + BCC to client 👇
+
+      // ==========================
+      // 2. BUSINESS EMAIL (YOUR CLIENT)
+      // ==========================
       await sendEmail({
-        to: "spencertechnologygroup@gmail.com",
-        bcc: [booking.email], // 🔥 THIS IS THE KEY ADD
-        subject: "🚨 New Booking Request - Maid in Dixie",
+        to: "maidindixiecleaningservices@gmail.com",
+        subject: "🚨 New Booking Request",
         html: `
-          <div style="font-family: Arial; padding:20px;">
-            <h2>New Booking Request</h2>
-            <p><strong>Name:</strong> ${booking.name}</p>
-            <p><strong>Email:</strong> ${booking.email}</p>
-            <p><strong>Phone:</strong> ${booking.phone}</p>
-            <p><strong>Date:</strong> ${booking.selectedDate}</p>
-            <p><strong>Time:</strong> ${booking.selectedSlot}</p>
-          </div>
-        `,
+    <div style="font-family: Arial; padding:20px;">
+      <h2>New Booking Request</h2>
+
+      <p><strong>Name:</strong> ${booking.name}</p>
+      <p><strong>Email:</strong> ${booking.email}</p>
+      <p><strong>Phone:</strong> ${booking.phone}</p>
+
+      <p><strong>Date:</strong> ${booking.selectedDate}</p>
+      <p><strong>Time:</strong> ${booking.selectedSlot}</p>
+
+      <p><strong>Address:</strong> ${booking.address || "N/A"}</p>
+      <p><strong>Notes:</strong> ${booking.notes || "None"}</p>
+
+      <p><strong>Add-ons:</strong><br/>
+        ${(booking.addOns || []).join("<br/>")}
+      </p>
+
+      <p style="margin-top:20px;">— System Notification</p>
+    </div>
+  `,
       });
 
-      console.log("📧 EMAILS SENT (ADMIN + CLIENT BCC)");
+      console.log("📧 EMAILS SENT (CLIENT + BUSINESS)");
     } catch (err) {
       console.error("⚠️ Email failed but booking saved:", err);
     }

@@ -29,7 +29,10 @@ export async function sendEmail({
             replyTo: "maidindixiecleaningservices@gmail.com",
         });
 
-        console.log("EMAIL SENT:", info.messageId);
+        console.log("EMAIL SENT:");
+        console.log("   TO:", to);
+        if (bcc) console.log("   BCC:", bcc);
+        console.log("   ID:", info.messageId);
 
         return { ok: true };
     } catch (error) {

@@ -7,13 +7,13 @@ export default function ServicesSection() {
   const [services, setServices] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("/api/pricing")
+    fetch("/api/services")
       .then((res) => res.json())
       .then((data) => {
         console.log("PRICING API:", data);
 
         // 🔥 CORRECT STRUCTURE
-        setServices(Array.isArray(data.data?.services) ? data.data.services : []);
+        setServices(Array.isArray(data.data) ? data.data : []);
       })
       .catch((err) => {
         console.error("Services load error:", err);
@@ -62,7 +62,7 @@ export default function ServicesSection() {
               {/* IMAGE (SAFE VERSION) */}
               <div className="h-64 w-full bg-gray-100">
                 <img
-                  src={service.image || "/images/services/basic.jpg"}
+                  src={service.image || "/images/services/standard-cleaning.jpg"}
                   alt={service.name || "Service"}
                   className="w-full h-full object-cover"
                 />

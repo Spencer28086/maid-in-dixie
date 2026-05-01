@@ -99,7 +99,12 @@ export default function GalleryAdminPage() {
     }
 
     // UPLOAD
-    async function upload(sectionIndex: number, itemIndex: number, field: string, file: File) {
+    async function upload(
+        sectionIndex: number,
+        itemIndex: number,
+        field: string,
+        file: File
+    ) {
         const fd = new FormData();
         fd.append("files", file);
 
@@ -111,9 +116,24 @@ export default function GalleryAdminPage() {
         const data = await res.json();
         if (!data.ok) return alert("Upload failed");
 
-        const updated = [...sections];
-        updated[sectionIndex].items[itemIndex][field] = data.files[0];
-        setSections(updated);
+        const imageUrl = data.files[0];
+
+        // 🔥 IMPORTANT: USE FUNCTIONAL STATE UPDATE
+        setSections((prev) => {
+            const updated = [...prev];
+
+            updated[sectionIndex] = {
+                ...updated[sectionIndex],
+                items: [...updated[sectionIndex].items],
+            };
+
+            updated[sectionIndex].items[itemIndex] = {
+                ...updated[sectionIndex].items[itemIndex],
+                [field]: imageUrl,
+            };
+
+            return updated;
+        });
     }
 
     return (

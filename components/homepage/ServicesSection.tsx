@@ -20,6 +20,17 @@ export default function ServicesSection() {
       });
   }, []);
 
+  const getServiceImage = (name: string) => {
+    const n = name?.toLowerCase() || "";
+
+    if (n.includes("standard")) return "/images/services/standard-cleaning.jpg";
+    if (n.includes("deep")) return "/images/services/deep-cleaning.jpg";
+    if (n.includes("move")) return "/images/services/move-cleaning.jpg";
+    if (n.includes("rv")) return "/images/services/rv-cleaning.jpg";
+
+    return "/images/services/standard-cleaning.jpg";
+  };
+
   return (
     <section className="relative py-28 overflow-hidden">
       <div className="absolute inset-0 bg-[#fff1f4]" />
@@ -62,7 +73,7 @@ export default function ServicesSection() {
               {/* IMAGE (SAFE VERSION) */}
               <div className="h-64 w-full bg-gray-100">
                 <img
-                  src={service.image || "/images/services/standard-cleaning.jpg"}
+                  src={service.image || getServiceImage(service.name)}
                   alt={service.name || "Service"}
                   className="w-full h-full object-cover"
                 />

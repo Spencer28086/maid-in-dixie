@@ -5,81 +5,80 @@ export default function Header() {
     <header className="w-full sticky top-0 z-50">
       {/* TOP BAR */}
       <div className="bg-[#f7cfd8] text-[#7a4a58] text-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-2 lg:px-10">
-
-          <p className="flex items-center gap-2 font-medium">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 lg:px-10">
+          <p className="flex items-center gap-2 font-medium text-xs sm:text-sm">
             <span className="text-xs">♥</span>
             Bringing a little Southern charm to every clean
           </p>
 
           <div className="flex items-center gap-3">
-            {/* (unchanged social icons) */}
+            {/* social icons */}
           </div>
         </div>
       </div>
 
       {/* MAIN HEADER */}
-      <div className="bg-white/70 backdrop-blur-xl border-b border-[#f1e4e7]/70 shadow-[0_8px_30px_rgba(0,0,0,0.05)] transition-all duration-300">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-10">
+      <div className="bg-white/70 backdrop-blur-xl border-b border-[#f1e4e7]/70 shadow-[0_8px_30px_rgba(0,0,0,0.05)]">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 lg:px-10">
 
           {/* LOGO */}
           <Link href="/" className="flex flex-col leading-tight">
-            <span className="font-serif text-xl text-[#2f2928]">
+            <span className="font-serif text-lg sm:text-xl text-[#2f2928]">
               Maid in Dixie
             </span>
-            <span className="text-[11px] uppercase tracking-[0.3em] text-[#c77b95]">
+            <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.3em] text-[#c77b95]">
               Cleaning Services
             </span>
           </Link>
 
-          {/* NAV */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-[#5a514d]">
+          {/* NAV (VISIBLE ON MOBILE NOW) */}
+          <nav className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm font-medium text-[#5a514d] overflow-x-auto">
 
-            {/* ✅ FIXED NAV */}
-            <Link href="/" className="hover:text-[#d95f91] transition">
+            <Link href="/" className="whitespace-nowrap hover:text-[#d95f91]">
               Home
             </Link>
 
-            <Link href="/#services" className="hover:text-[#d95f91] transition">
+            <Link href="/#services" className="whitespace-nowrap hover:text-[#d95f91]">
               Services
             </Link>
 
-            <Link href="/#pricing" className="hover:text-[#d95f91] transition">
+            <Link href="/#pricing" className="whitespace-nowrap hover:text-[#d95f91]">
               Pricing
             </Link>
 
-            <Link href="/policies" className="hover:text-[#d95f91] transition">
+            <Link href="/policies" className="whitespace-nowrap hover:text-[#d95f91]">
               Policies
             </Link>
 
-            <Link href="/#gallery" className="hover:text-[#d95f91] transition">
+            <Link href="/#gallery" className="whitespace-nowrap hover:text-[#d95f91]">
               Gallery
             </Link>
 
-            <Link href="/about" className="hover:text-[#d95f91] transition">
-              About Us
+            <Link href="/about" className="whitespace-nowrap hover:text-[#d95f91]">
+              About
             </Link>
 
-            <Link href="/contact" className="hover:text-[#d95f91] transition">
+            <Link href="/contact" className="whitespace-nowrap hover:text-[#d95f91]">
               Contact
             </Link>
           </nav>
 
           {/* RIGHT SIDE */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
 
+            {/* ADMIN (NOW ALWAYS VISIBLE) */}
             <Link
               href="/admin"
-              className="hidden sm:inline-flex items-center justify-center rounded-md border border-[#e7d3d8] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#7a5c63] shadow-sm transition hover:border-[#d95f91] hover:text-[#d95f91]"
+              className="inline-flex items-center justify-center rounded-md border border-[#e7d3d8] bg-white px-3 py-1.5 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.12em] text-[#7a5c63] shadow-sm hover:border-[#d95f91] hover:text-[#d95f91]"
             >
               Admin
             </Link>
 
             <Link
               href="/booking"
-              className="inline-flex items-center justify-center rounded-md bg-[#d95f91] px-5 py-2.5 text-sm font-bold uppercase tracking-[0.12em] text-white shadow-[0_12px_25px_rgba(217,95,145,0.3)] transition hover:-translate-y-0.5 hover:bg-[#c94f82] hover:shadow-[0_18px_40px_rgba(217,95,145,0.4)]"
+              className="inline-flex items-center justify-center rounded-md bg-[#d95f91] px-4 py-2 text-xs sm:text-sm font-bold uppercase tracking-[0.12em] text-white shadow hover:bg-[#c94f82]"
             >
-              Book Now
+              Book
             </Link>
           </div>
         </div>

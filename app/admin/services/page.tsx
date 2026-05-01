@@ -2,60 +2,127 @@
 
 import { useEffect, useState } from "react";
 
-export default function ServicesAdminPage() {
-    const [services, setServices] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+type ServiceFormItem = {
+    title: string;
+    subtitle: string;
+    description: string;
+    features: string[];
+    price: string;
+    image: string;
+};
 
-    // LOAD SERVICES
+function normalizeService(item: any): ServiceFormItem {
+    return {
+        title: item?.title || item?.name || "",
+        subtitle: item?.subtitle || "",
+        description: item?.description || item?.desc || "",
+        features: Array.isArray(item?.features) ? item.features : [""],
+        price:
+            item?.price === null || item?.price === undefined
+                ? ""
+                : String(item.price),
+        image: item?.image || "",
+    };
+}
+
+export default function ServicesAdminPage() {
+    const [services, setServices] = useState<ServiceFormItem[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+
     useEffect(() => {
-        fetch("/api/services")
-            .then((res) => res.json())
-            .then((data) => {
-                setServices(data.data || []);
-                setLoading(false);
-            })
-            .catch((err) => {
+        async function loadServices() {
+            try {
+                const res = await fetch("/api/services", { cache: "no-store" });
+                const json = await res.json();
+
+                const loaded = Array.isArray(json.data)
+                    ? json.data.map(normalizeService)
+                    : [];
+
+                setServices(loaded);
+            } catch (err) {
                 console.error("Failed to load services:", err);
+                alert("Failed to load services.");
+            } finally {
                 setLoading(false);
-            });
+            }
+        }
+
+        loadServices();
     }, []);
 
-    // UPDATE FIELD
-    function updateField(index: number, field: string, value: any) {
-        const updated = [...services];
-        updated[index][field] = value;
-        setServices(updated);
+    function updateField(
+        index: number,
+        field: keyof ServiceFormItem,
+        value: string
+    ) {
+        setServices((prev) => {
+            const updated = [...prev];
+            updated[index] = {
+                ...updated[index],
+                [field]: value,
+            };
+            return updated;
+        });
     }
 
-    // UPDATE FEATURE
-    function updateFeature(serviceIndex: number, featureIndex: number, value: string) {
-        const updated = [...services];
-        updated[serviceIndex].features[featureIndex] = value;
-        setServices(updated);
+    function updateFeature(
+        serviceIndex: number,
+        featureIndex: number,
+        value: string
+    ) {
+        setServices((prev) => {
+            const updated = [...prev];
+            const features = [...(updated[serviceIndex].features || [])];
+
+            features[featureIndex] = value;
+
+            updated[serviceIndex] = {
+                ...updated[serviceIndex],
+                features,
+            };
+
+            return updated;
+        });
     }
 
-    // ADD FEATURE
     function addFeature(serviceIndex: number) {
-        const updated = [...services];
-        updated[serviceIndex].features.push("");
-        setServices(updated);
+        setServices((prev) => {
+            const updated = [...prev];
+
+            updated[serviceIndex] = {
+                ...updated[serviceIndex],
+                features: [...(updated[serviceIndex].features || []), ""],
+            };
+
+            return updated;
+        });
     }
 
-    // REMOVE FEATURE
     function removeFeature(serviceIndex: number, featureIndex: number) {
-        const updated = [...services];
-        updated[serviceIndex].features.splice(featureIndex, 1);
-        setServices(updated);
+        setServices((prev) => {
+            const updated = [...prev];
+            const features = [...(updated[serviceIndex].features || [])];
+
+            features.splice(featureIndex, 1);
+
+            updated[serviceIndex] = {
+                ...updated[serviceIndex],
+                features: features.length > 0 ? features : [""],
+            };
+
+            return updated;
+        });
     }
 
-    // ADD SERVICE
     function addService() {
-        setServices([
-            ...services,
+        setServices((prev) => [
+            ...prev,
             {
                 title: "",
                 subtitle: "",
-                desc: "",
+                description: "",
                 features: [""],
                 price: "",
                 image: "",
@@ -63,35 +130,44 @@ export default function ServicesAdminPage() {
         ]);
     }
 
-    // DELETE SERVICE
     function deleteService(index: number) {
-        const updated = [...services];
-        updated.splice(index, 1);
-        setServices(updated);
+        setServices((prev) => prev.filter((_, i) => i !== index));
     }
 
-    // SAVE
     async function save() {
-        const res = await fetch("/api/services");
-        const json = await res.json();
+        try {
+            setSaving(true);
 
-        const mapped = json.data.map((item: any) => ({
-            title: item.name || "",
-            subtitle: "", // not stored yet
-            description: item.description || "",
-            price: item.price ? String(item.price) : "",
-            image: "",
-            features: [], // not stored yet
-        }));
+            const payload = services.map((service) => ({
+                title: service.title,
+                subtitle: service.subtitle,
+                description: service.description,
+                features: service.features.filter((feature) => feature.trim() !== ""),
+                price: service.price,
+                image: service.image,
+            }));
 
-        setServices(mapped);
+            const res = await fetch("/api/services", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
 
-        const data = await res.json();
+            const data = await res.json();
 
-        if (data.ok) {
+            if (!res.ok || !data.ok) {
+                alert("Failed to save services");
+                return;
+            }
+
             alert("Services saved successfully");
-        } else {
+        } catch (err) {
+            console.error("Failed to save services:", err);
             alert("Failed to save services");
+        } finally {
+            setSaving(false);
         }
     }
 
@@ -102,12 +178,10 @@ export default function ServicesAdminPage() {
     return (
         <main className="min-h-screen bg-[#fff7f8] p-10">
             <div className="max-w-5xl mx-auto bg-white p-8 rounded-3xl shadow-xl border border-[#f3d1d8] space-y-8">
-
                 <h1 className="text-2xl font-serif">Services Manager</h1>
 
                 {services.map((service, i) => (
                     <div key={i} className="border p-6 rounded-2xl space-y-4">
-
                         <input
                             value={service.title}
                             onChange={(e) => updateField(i, "title", e.target.value)}
@@ -123,8 +197,8 @@ export default function ServicesAdminPage() {
                         />
 
                         <textarea
-                            value={service.desc}
-                            onChange={(e) => updateField(i, "desc", e.target.value)}
+                            value={service.description}
+                            onChange={(e) => updateField(i, "description", e.target.value)}
                             placeholder="Description"
                             className="w-full border p-2 rounded"
                         />
@@ -143,17 +217,17 @@ export default function ServicesAdminPage() {
                             className="w-full border p-2 rounded"
                         />
 
-                        {/* FEATURES */}
                         <div>
                             <p className="font-semibold mb-2">Features</p>
 
-                            {service.features.map((f: string, fi: number) => (
+                            {(service.features || [""]).map((feature, fi) => (
                                 <div key={fi} className="flex gap-2 mb-2">
                                     <input
-                                        value={f}
+                                        value={feature}
                                         onChange={(e) => updateFeature(i, fi, e.target.value)}
                                         className="flex-1 border p-2 rounded"
                                     />
+
                                     <button
                                         type="button"
                                         onClick={() => removeFeature(i, fi)}
@@ -180,24 +254,20 @@ export default function ServicesAdminPage() {
                         >
                             Delete Service
                         </button>
-
                     </div>
                 ))}
 
-                <button
-                    onClick={addService}
-                    className="text-pink-600 font-semibold"
-                >
+                <button onClick={addService} className="text-pink-600 font-semibold">
                     + Add New Service
                 </button>
 
                 <button
                     onClick={save}
-                    className="w-full bg-[#d95f91] text-white py-3 rounded-xl font-semibold"
+                    disabled={saving}
+                    className="w-full bg-[#d95f91] text-white py-3 rounded-xl font-semibold disabled:opacity-60"
                 >
-                    Save Services
+                    {saving ? "Saving..." : "Save Services"}
                 </button>
-
             </div>
         </main>
     );

@@ -12,6 +12,7 @@ type Booking = {
     addOns: string[];
     totalEstimate: number | null;
     depositAmount: number | null;
+    paymentStatus?: string;
 };
 
 const SQUARE_LINK = "https://square.link/u/ERNQ5DGs";
@@ -22,10 +23,6 @@ export default function PaymentPage() {
 
     const [booking, setBooking] = useState<Booking | null>(null);
     const [loading, setLoading] = useState(true);
-
-    // ✅ NEW STATE
-    const [confirming, setConfirming] = useState(false);
-    const [confirmed, setConfirmed] = useState(false);
 
     useEffect(() => {
         async function fetchBooking() {
@@ -45,6 +42,30 @@ export default function PaymentPage() {
         }
 
         if (bookingId) fetchBooking();
+    }, [bookingId]);
+
+    // 🔄 AUTO POLL FOR PAYMENT UPDATE
+    useEffect(() => {
+        if (!bookingId) return;
+
+        const interval = setInterval(async () => {
+            const res = await fetch("/api/booking", { cache: "no-store" });
+            const data = await res.json();
+
+            const bookingsArray = Array.isArray(data)
+                ? data
+                : data.bookings;
+
+            const updated = bookingsArray.find(
+                (b: Booking) => b.id === bookingId
+            );
+
+            if (updated) {
+                setBooking(updated);
+            }
+        }, 5000);
+
+        return () => clearInterval(interval);
     }, [bookingId]);
 
     if (loading) {
@@ -67,6 +88,8 @@ export default function PaymentPage() {
         booking.totalEstimate && booking.depositAmount
             ? booking.totalEstimate - booking.depositAmount
             : null;
+
+    const isPaid = booking.paymentStatus === "PAID";
 
     return (
         <section className="min-h-screen bg-[#fff7f8] py-12 px-4">
@@ -109,68 +132,36 @@ export default function PaymentPage() {
                         Pay Deposit
                     </h2>
 
-                    <p className="text-sm text-gray-600">
-                        To secure your booking, please pay your deposit of{" "}
-                        <strong>${booking.depositAmount}</strong>.
-                    </p>
+                    {!isPaid && (
+                        <>
+                            <p className="text-sm text-gray-600">
+                                Please pay your deposit of{" "}
+                                <strong>${booking.depositAmount}</strong>.
+                            </p>
 
-                    <p className="text-xs text-gray-500">
-                        Please enter the exact amount shown above at checkout.
-                    </p>
+                            <p className="text-xs text-gray-500">
+                                Enter this exact amount on the Square payment page.
+                            </p>
 
-                    <a
-                        href={SQUARE_LINK}
-                        target="_blank"
-                        className="block text-center py-3 rounded-xl bg-[#d95f91] text-white font-semibold"
-                    >
-                        Pay Deposit
-                    </a>
+                            <a
+                                href={SQUARE_LINK}
+                                target="_blank"
+                                className="block text-center py-3 rounded-xl bg-[#d95f91] text-white font-semibold"
+                            >
+                                Pay Deposit
+                            </a>
 
-                    {/* ✅ REPLACED BUTTON */}
-                    <button
-                        disabled={confirming || confirmed}
-                        onClick={async () => {
-                            try {
-                                setConfirming(true);
+                            <p className="text-sm text-gray-500 mt-2">
+                                Waiting for payment confirmation...
+                            </p>
+                        </>
+                    )}
 
-                                const res = await fetch("/api/booking/confirm-payment", {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                    },
-                                    body: JSON.stringify({
-                                        bookingId: booking.id,
-                                    }),
-                                });
-
-                                const data = await res.json();
-
-                                if (!res.ok) {
-                                    throw new Error(data.error || "Failed");
-                                }
-
-                                setConfirmed(true);
-
-                                alert("Payment confirmed! Your booking is secured.");
-
-                            } catch (err) {
-                                console.error(err);
-                                alert("Something went wrong confirming payment.");
-                            } finally {
-                                setConfirming(false);
-                            }
-                        }}
-                        className={`block w-full mt-4 text-center py-3 rounded-xl font-semibold ${confirmed
-                                ? "bg-gray-400 text-white"
-                                : "bg-green-600 text-white"
-                            }`}
-                    >
-                        {confirmed
-                            ? "Payment Confirmed ✅"
-                            : confirming
-                                ? "Confirming..."
-                                : "I’ve Completed Payment"}
-                    </button>
+                    {isPaid && (
+                        <div className="text-green-600 font-semibold text-center">
+                            Deposit Paid ✅ Your booking is secured.
+                        </div>
+                    )}
                 </div>
 
                 {/* REMAINING BALANCE */}
@@ -181,13 +172,7 @@ export default function PaymentPage() {
                         </h2>
 
                         <p className="text-sm text-gray-600">
-                            Your remaining balance of{" "}
-                            <strong>${remaining}</strong> must be paid by{" "}
-                            <strong>6PM on your service day</strong>.
-                        </p>
-
-                        <p className="text-xs text-gray-500">
-                            Please enter the exact amount shown above at checkout.
+                            Remaining balance: <strong>${remaining}</strong>
                         </p>
 
                         <a

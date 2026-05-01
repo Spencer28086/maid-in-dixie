@@ -32,7 +32,7 @@ export async function POST(req: Request) {
         await prisma.serviceItem.deleteMany();
 
         const formatted = body.map((item: any, index: number) => ({
-            name: item.name,
+            name: item.title || "", // 🔥 FIXED
             description: item.description || "",
             price: item.price ? parseFloat(item.price) : null,
             position: index,

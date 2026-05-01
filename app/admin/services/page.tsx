@@ -72,13 +72,19 @@ export default function ServicesAdminPage() {
 
     // SAVE
     async function save() {
-        const res = await fetch("/api/services", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(services),
-        });
+        const res = await fetch("/api/services");
+        const json = await res.json();
+
+        const mapped = json.data.map((item: any) => ({
+            title: item.name || "",
+            subtitle: "", // not stored yet
+            description: item.description || "",
+            price: item.price ? String(item.price) : "",
+            image: "",
+            features: [], // not stored yet
+        }));
+
+        setServices(mapped);
 
         const data = await res.json();
 

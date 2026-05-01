@@ -23,6 +23,10 @@ export default function PaymentPage() {
     const [booking, setBooking] = useState<Booking | null>(null);
     const [loading, setLoading] = useState(true);
 
+    // ✅ NEW STATE
+    const [confirming, setConfirming] = useState(false);
+    const [confirmed, setConfirmed] = useState(false);
+
     useEffect(() => {
         async function fetchBooking() {
             const res = await fetch("/api/booking", { cache: "no-store" });
@@ -122,25 +126,50 @@ export default function PaymentPage() {
                         Pay Deposit
                     </a>
 
-                    {/* 👇 ADD THIS RIGHT HERE */}
+                    {/* ✅ REPLACED BUTTON */}
                     <button
+                        disabled={confirming || confirmed}
                         onClick={async () => {
-                            await fetch("/api/booking", {
-                                method: "PATCH",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({
-                                    id: booking.id,
-                                    paymentStatus: "PAID",
-                                }),
-                            });
+                            try {
+                                setConfirming(true);
 
-                            alert("Payment confirmed! Your booking is now secured.");
+                                const res = await fetch("/api/booking/confirm-payment", {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify({
+                                        bookingId: booking.id,
+                                    }),
+                                });
+
+                                const data = await res.json();
+
+                                if (!res.ok) {
+                                    throw new Error(data.error || "Failed");
+                                }
+
+                                setConfirmed(true);
+
+                                alert("Payment confirmed! Your booking is secured.");
+
+                            } catch (err) {
+                                console.error(err);
+                                alert("Something went wrong confirming payment.");
+                            } finally {
+                                setConfirming(false);
+                            }
                         }}
-                        className="block w-full mt-4 text-center py-3 rounded-xl bg-green-600 text-white font-semibold"
+                        className={`block w-full mt-4 text-center py-3 rounded-xl font-semibold ${confirmed
+                                ? "bg-gray-400 text-white"
+                                : "bg-green-600 text-white"
+                            }`}
                     >
-                        I’ve Completed Payment
+                        {confirmed
+                            ? "Payment Confirmed ✅"
+                            : confirming
+                                ? "Confirming..."
+                                : "I’ve Completed Payment"}
                     </button>
                 </div>
 

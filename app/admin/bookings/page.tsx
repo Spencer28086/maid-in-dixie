@@ -267,9 +267,27 @@ export default function AdminBookingsPage() {
                     <td className="p-4">{booking.selectedSlot}</td>
 
                     <td className="p-4">
-                      <span className="text-xs font-bold">
-                        {booking.status}
-                      </span>
+                      <div className="flex items-center gap-2 flex-wrap">
+
+                        {/* STATUS */}
+                        <span className="text-xs font-bold px-3 py-1 rounded-full bg-gray-100">
+                          {booking.status}
+                        </span>
+
+                        {/* PAYMENT BADGE */}
+                        {booking.paymentStatus === "PAID" && (
+                          <span className="text-xs font-bold px-3 py-1 rounded-full bg-green-100 text-green-700">
+                            PAID
+                          </span>
+                        )}
+
+                        {booking.paymentStatus !== "PAID" && booking.status === "PENDING_PAYMENT" && (
+                          <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-100 text-blue-700">
+                            AWAITING DEPOSIT
+                          </span>
+                        )}
+
+                      </div>
                     </td>
 
                     <td className="p-4">
@@ -283,7 +301,11 @@ export default function AdminBookingsPage() {
                           }
                           className="bg-green-500 text-white px-3 py-1 rounded-full text-xs disabled:opacity-50"
                         >
-                          {booking.paymentStatus !== "PAID" ? "Awaiting Payment" : "Approve"}
+                          {booking.paymentStatus !== "PAID"
+                            ? "Deposit Required"
+                            : booking.status === "APPROVED"
+                              ? "Approved"
+                              : "Approve"}
                         </button>
 
                         <button

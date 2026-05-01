@@ -1,20 +1,37 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// 🔹 GET gallery
+// 🔹 GET gallery (RETURN GROUPED STRUCTURE)
 export async function GET() {
     try {
         const items = await prisma.galleryItem.findMany({
             orderBy: { position: "asc" },
         });
 
-        return NextResponse.json({
-            data: items,
+        // 🔥 GROUP INTO SECTIONS (WHAT FRONTEND EXPECTS)
+        const grouped: Record<string, any[]> = {};
+
+        items.forEach((item) => {
+            if (!grouped[item.category]) {
+                grouped[item.category] = [];
+            }
+
+            grouped[item.category].push({
+                type: item.type,
+                image: item.imageUrl, // 🔥 map DB -> frontend
+            });
         });
 
+        const sections = Object.keys(grouped).map((category) => ({
+            category,
+            items: grouped[category],
+        }));
+
+        return NextResponse.json({
+            data: sections,
+        });
     } catch (err) {
         console.error("GET gallery error:", err);
-
         return NextResponse.json({ data: [] });
     }
 }
@@ -33,26 +50,35 @@ export async function POST(req: Request) {
 
         const items = body.data;
 
-        // 🔥 clear existing
+        // 🔥 CLEAR OLD DATA
         await prisma.galleryItem.deleteMany();
 
-        // 🔥 rebuild
-        const formatted = items.map((item: any, index: number) => ({
-            imageUrl: item.imageUrl,
-            category: item.category || "general",
-            type: item.type || "single",
-            position: index,
-        }));
+        // 🔥 FLATTEN SECTIONS INTO DB FORMAT
+        let position = 0;
+
+        const formatted = items.flatMap((section: any) =>
+            (section.items || []).map((item: any) => {
+                const record = {
+                    imageUrl: item.image || item.after || item.beforeAfter || "", // 🔥 FIX MAPPING
+                    category: section.category || "general",
+                    type: item.type || "single",
+                    position: position++,
+                };
+
+                return record;
+            })
+        );
+
+        // 🔥 FILTER OUT EMPTY IMAGES (VERY IMPORTANT)
+        const cleaned = formatted.filter((item) => item.imageUrl);
 
         await prisma.galleryItem.createMany({
-            data: formatted,
+            data: cleaned,
         });
 
         return NextResponse.json({ ok: true });
-
     } catch (err) {
         console.error("POST gallery error:", err);
-
         return NextResponse.json({ ok: false });
     }
 }

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 
+const SQUARE_LINK = "https://square.link/u/ERNQ5DGs";
+
 export async function POST(req: Request) {
   try {
     const { bookingId } = await req.json();
@@ -38,8 +40,6 @@ export async function POST(req: Request) {
       );
     }
 
-    const paymentLink = `https://www.maidindixiecleaningservices.com/booking/payment/${booking.id}`;
-
     console.log("📧 Sending deposit email to:", booking.email);
     console.log("💰 Deposit:", booking.depositAmount);
 
@@ -56,10 +56,17 @@ export async function POST(req: Request) {
 
           <p><strong>Deposit Due:</strong> $${booking.depositAmount}</p>
 
-          <a href="${paymentLink}" 
-             style="display:inline-block;padding:12px 20px;background:#d95f91;color:#fff;text-decoration:none;border-radius:6px;margin-top:15px;">
-            Pay Deposit
+          <a href="${SQUARE_LINK}" 
+             target="_blank"
+             style="display:inline-block;padding:12px 20px;background:#d95f91;color:#fff;text-decoration:none;border-radius:6px;margin-top:15px;font-weight:bold;">
+            Pay Your Deposit
           </a>
+
+          <p style="margin-top:20px;font-size:14px;color:#555;">
+            <strong>IMPORTANT:</strong><br/>
+            When completing your payment, please enter your booking ID in the note field:<br/>
+            <strong>${booking.id}</strong>
+          </p>
 
           <p style="margin-top:20px;">— Maid in Dixie Cleaning Services</p>
         </div>

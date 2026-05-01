@@ -83,6 +83,21 @@ export async function POST(req: NextRequest) {
             },
         });
 
+        // 📧 SEND RECEIPT EMAIL
+        try {
+            await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/email/send-receipt`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ bookingId }),
+            });
+
+            console.log("📧 Receipt email triggered");
+        } catch (err) {
+            console.error("❌ Failed to trigger receipt email:", err);
+        }
+
         // =========================
         // 📧 EMAILS
         // =========================

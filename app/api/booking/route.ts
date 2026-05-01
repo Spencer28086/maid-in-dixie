@@ -73,8 +73,8 @@ export async function POST(req: Request) {
           status: "PENDING_REVIEW",
           paymentStatus: "UNPAID",
 
-          totalEstimate: null,
-          depositAmount: null,
+          totalEstimate: typeof body.totalEstimate === "number" ? body.totalEstimate : null,
+          depositAmount: typeof body.depositAmount === "number" ? body.depositAmount : null,
         },
       });
 

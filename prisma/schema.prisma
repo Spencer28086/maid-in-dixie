@@ -62,7 +62,7 @@ model Booking {
 }
 
 model SiteContent {
-  id           String @id @default("main")
+  id           String   @id @default("main")
   businessName String
   phone        String
   email        String

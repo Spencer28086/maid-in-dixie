@@ -1,14 +1,12 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-function getResend() {
-    const key = process.env.RESEND_API_KEY;
-
-    if (!key) {
-        throw new Error("Missing RESEND_API_KEY");
-    }
-
-    return new Resend(key);
-}
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+});
 
 export async function sendEmail({
     to,
@@ -19,16 +17,24 @@ export async function sendEmail({
     to: string;
     subject: string;
     html: string;
-    bcc?: string[]; // ✅ ADDED
+    bcc?: string[];
 }) {
-    const resend = getResend();
+    try {
+        const info = await transporter.sendMail({
+            from: `"Maid in Dixie Cleaning Services" <${process.env.EMAIL_USER}>`,
+            to,
+            bcc,
+            subject,
+            html,
+            replyTo: "maidindixiecleaningservices@gmail.com",
+        });
 
-    return resend.emails.send({
-        from: "Maid in Dixie Cleaning Services <onboarding@resend.dev>",
-        to,
-        subject,
-        html,
-        replyTo: "maidindixiecleaningservices@gmail.com",
-        ...(bcc ? { bcc } : {}), // ✅ ADDED
-    });
+        console.log("EMAIL SENT:", info.messageId);
+
+        return { ok: true };
+    } catch (error) {
+        console.error("EMAIL ERROR:", error);
+
+        return { ok: false };
+    }
 }

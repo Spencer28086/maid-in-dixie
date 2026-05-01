@@ -14,10 +14,10 @@ export default function Home() {
   return (
     <>
       <section id="home">
-        <FloatingCowgirl />
-
         <Hero />
       </section>
+
+      <FloatingCowgirl />
 
       <SectionWave />
 

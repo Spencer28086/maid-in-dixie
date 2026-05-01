@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import FloatingCowgirl from "@/components/ui/FloatingCowgirl";
+
 
 export default function Hero() {
   return (

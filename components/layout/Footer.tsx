@@ -31,12 +31,10 @@ export default function Footer() {
         </p>
 
         {/* Contact Info (NEW - dynamic) */}
-        {content && (
-          <div className="mt-2 text-xs text-[#a38a82] space-y-1">
-            <p>{content.city}</p>
-            <p>Phone: {content.phone}</p>
-            <p>Email: {content.email}</p>
-          </div>
+        {content?.city && (
+          <p className="mt-2 text-xs text-[#a38a82]">
+            {content.city}
+          </p>
         )}
 
         {/* Divider */}

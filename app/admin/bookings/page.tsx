@@ -323,6 +323,36 @@ export default function AdminBookingsPage() {
                         >
                           Reset
                         </button>
+
+                        <button
+                          onClick={async () => {
+                            try {
+                              const res = await fetch("/api/email/send-receipt", {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                  bookingId: booking.id,
+                                }),
+                              });
+
+                              const data = await res.json();
+
+                              if (!res.ok) {
+                                throw new Error(data.message || "Failed");
+                              }
+
+                              alert("✅ Receipt sent!");
+                            } catch (err) {
+                              console.error(err);
+                              alert("❌ Failed to send receipt");
+                            }
+                          }}
+                          className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs"
+                        >
+                          Test Receipt
+                        </button>
                       </div>
                       <div className="mt-4">
                         <input

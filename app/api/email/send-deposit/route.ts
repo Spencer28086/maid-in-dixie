@@ -56,9 +56,9 @@ export async function POST(req: Request) {
 
           <p><strong>Deposit Due:</strong> $${booking.depositAmount}</p>
 
-          <a href="${SQUARE_LINK}" 
+          <a href="https://maidindixiecleaningservices.com/booking/payment/${booking.id}"
              target="_blank"
-             style="display:inline-block;padding:12px 20px;background:#d95f91;color:#fff;text-decoration:none;border-radius:6px;margin-top:15px;font-weight:bold;">
+             style="display:inline-block;padding:12px 20px;background:#d95f91;color:white;border-radius:8px;text-decoration:none;font-weight:bold;">
             Pay Your Deposit
           </a>
 

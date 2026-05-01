@@ -15,6 +15,7 @@ export async function POST(req: Request) {
         for (const file of files) {
             const blob = await put(file.name, file, {
                 access: "public",
+                addRandomSuffix: true, // 🔥 FIXES DUPLICATE FILE ERROR
             });
 
             uploadedUrls.push(blob.url);

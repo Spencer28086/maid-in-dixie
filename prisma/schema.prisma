@@ -18,16 +18,9 @@ model Service {
 model Testimonial {
   id        String   @id @default(cuid())
   name      String
-  content   String
-  rating    Int
+  text      String
+  status    String   // "pending" | "approved"
   createdAt DateTime @default(now())
-}
-
-model GalleryItem {
-  id         String   @id @default(cuid())
-  beforeUrl  String
-  afterUrl   String
-  createdAt  DateTime @default(now())
 }
 
 model Settings {
@@ -78,4 +71,54 @@ model Availability {
   status    String
   slots     String[]
   updatedAt DateTime @updatedAt
+}
+
+model Pricing {
+  id        String   @id @default(cuid())
+  type      String   // "service" or "addon"
+  name      String
+  price     Float
+  order     Int
+  updatedAt DateTime @updatedAt
+}
+
+model GalleryItem {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  category  String
+  type      String
+  position  Int
+  createdAt DateTime @default(now())
+}
+
+model Quote {
+  id           String   @id @default(cuid())
+  name         String
+  email        String
+  cleaningType String?
+  bedrooms     String?
+  bathrooms    String?
+  sqft         String?
+  condition    String?
+  message      String?
+  status       String
+  estimate     Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model TikTokVideo {
+  id        String   @id @default(cuid())
+  url       String
+  position  Int
+  createdAt DateTime @default(now())
+}
+
+model ServiceItem {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float?
+  position    Int
+  createdAt   DateTime @default(now())
 }

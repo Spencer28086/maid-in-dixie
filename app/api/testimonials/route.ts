@@ -1,44 +1,13 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { prisma } from "@/lib/prisma";
+import { sendEmail } from "@/lib/email";
 
-const FILE_PATH = path.join(
-    process.cwd(),
-    "data",
-    "testimonials.json"
-);
-
-// ✅ SITE CONTENT (for email destination)
-const SITE_CONTENT_PATH = path.join(
-    process.cwd(),
-    "data",
-    "site-content.json"
-);
-
-function readData() {
-    try {
-        return JSON.parse(fs.readFileSync(FILE_PATH, "utf-8"));
-    } catch {
-        return [];
-    }
-}
-
-function writeData(data: any) {
-    fs.writeFileSync(FILE_PATH, JSON.stringify(data, null, 2), "utf-8");
-}
-
-function readSiteContent() {
-    try {
-        return JSON.parse(fs.readFileSync(SITE_CONTENT_PATH, "utf-8"));
-    } catch {
-        return {};
-    }
-}
-
-// ✅ GET ALL TESTIMONIALS
+// GET ALL TESTIMONIALS
 export async function GET() {
     try {
-        const data = readData();
+        const data = await prisma.testimonial.findMany({
+            orderBy: { createdAt: "desc" },
+        });
 
         return NextResponse.json({
             ok: true,
@@ -54,15 +23,26 @@ export async function GET() {
     }
 }
 
-// ✅ POST HANDLER (SMART LOGIC + EMAIL)
+// POST HANDLER
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const existing = readData();
 
         // 🧠 CASE 1: ADMIN SAVE (ARRAY)
         if (Array.isArray(body)) {
-            writeData(body);
+            // clear existing
+            await prisma.testimonial.deleteMany();
+
+            // rebuild
+            const formatted = body.map((item: any) => ({
+                name: item.name,
+                text: item.text,
+                status: item.status || "approved",
+            }));
+
+            await prisma.testimonial.createMany({
+                data: formatted,
+            });
 
             return NextResponse.json({
                 ok: true,
@@ -70,41 +50,36 @@ export async function POST(req: Request) {
             });
         }
 
-        // 🧠 CASE 2: CLIENT SUBMISSION (OBJECT)
+        // 🧠 CASE 2: CLIENT SUBMISSION
         if (body.text && body.name) {
-            const newItem = {
-                text: body.text,
-                name: body.name,
-                status: "pending",
-                createdAt: new Date().toISOString(),
-            };
+            const newItem = await prisma.testimonial.create({
+                data: {
+                    name: body.name,
+                    text: body.text,
+                    status: "pending",
+                },
+            });
 
-            const updated = [...existing, newItem];
-
-            writeData(updated);
-
-            // 🔥 SEND EMAIL NOTIFICATION
+            // 🔥 SEND EMAIL (FIXED — NO localhost)
             try {
-                const site = readSiteContent();
+                const site = await prisma.siteContent.findUnique({
+                    where: { id: "main" },
+                });
 
-                await fetch("http://localhost:3002/api/email/send-notification", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
+                if (site?.email) {
+                    await sendEmail({
                         to: site.email,
                         subject: "New Testimonial Submitted",
                         html: `
-                            <h2>New Testimonial Awaiting Approval</h2>
-                            <p><strong>Name:</strong> ${newItem.name}</p>
-                            <p><strong>Message:</strong></p>
-                            <p>${newItem.text}</p>
-                            <br/>
-                            <p>Go to your admin panel to approve or deny this testimonial.</p>
-                        `,
-                    }),
-                });
+              <h2>New Testimonial Awaiting Approval</h2>
+              <p><strong>Name:</strong> ${newItem.name}</p>
+              <p><strong>Message:</strong></p>
+              <p>${newItem.text}</p>
+              <br/>
+              <p>Go to your admin panel to approve or deny this testimonial.</p>
+            `,
+                    });
+                }
             } catch (emailErr) {
                 console.error("Email notification failed:", emailErr);
             }

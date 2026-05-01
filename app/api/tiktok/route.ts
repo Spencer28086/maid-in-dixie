@@ -1,34 +1,49 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { prisma } from "@/lib/prisma";
 
-const filePath = path.join(process.cwd(), "data", "tiktok.json");
-
+// GET videos
 export async function GET() {
     try {
-        if (!fs.existsSync(filePath)) {
-            return NextResponse.json({ videos: [] });
-        }
+        const videos = await prisma.tikTokVideo.findMany({
+            orderBy: { position: "asc" },
+        });
 
-        const raw = fs.readFileSync(filePath, "utf-8");
-        const json = JSON.parse(raw);
+        return NextResponse.json({
+            videos: videos.map((v) => v.url),
+        });
 
-        return NextResponse.json(json);
     } catch (err) {
         console.error("TikTok GET error:", err);
+
         return NextResponse.json({ videos: [] });
     }
 }
 
+// SAVE videos
 export async function POST(req: Request) {
     try {
         const body = await req.json();
 
-        fs.writeFileSync(filePath, JSON.stringify(body, null, 2));
+        const videos = body.videos || [];
+
+        // clear existing
+        await prisma.tikTokVideo.deleteMany();
+
+        // rebuild with order
+        const formatted = videos.map((url: string, index: number) => ({
+            url,
+            position: index,
+        }));
+
+        await prisma.tikTokVideo.createMany({
+            data: formatted,
+        });
 
         return NextResponse.json({ ok: true });
+
     } catch (err) {
         console.error("TikTok POST error:", err);
+
         return NextResponse.json({ ok: false });
     }
 }

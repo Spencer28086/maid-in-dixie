@@ -1,23 +1,55 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { prisma } from "@/lib/prisma";
 
-const FILE = path.join(process.cwd(), "data", "services.json");
-
-function read() {
-    return JSON.parse(fs.readFileSync(FILE, "utf-8"));
-}
-
-function write(data: any) {
-    fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
-}
-
+// GET services
 export async function GET() {
-    return NextResponse.json({ ok: true, data: read() });
+    try {
+        const data = await prisma.serviceItem.findMany({
+            orderBy: { position: "asc" },
+        });
+
+        return NextResponse.json({
+            ok: true,
+            data,
+        });
+
+    } catch (err) {
+        console.error("SERVICES GET ERROR:", err);
+
+        return NextResponse.json(
+            { ok: false, data: [] },
+            { status: 500 }
+        );
+    }
 }
 
+// SAVE services
 export async function POST(req: Request) {
-    const body = await req.json();
-    write(body);
-    return NextResponse.json({ ok: true });
+    try {
+        const body = await req.json();
+
+        // clear existing
+        await prisma.serviceItem.deleteMany();
+
+        const formatted = body.map((item: any, index: number) => ({
+            name: item.name,
+            description: item.description || "",
+            price: item.price ? parseFloat(item.price) : null,
+            position: index,
+        }));
+
+        await prisma.serviceItem.createMany({
+            data: formatted,
+        });
+
+        return NextResponse.json({ ok: true });
+
+    } catch (err) {
+        console.error("SERVICES POST ERROR:", err);
+
+        return NextResponse.json(
+            { ok: false },
+            { status: 500 }
+        );
+    }
 }

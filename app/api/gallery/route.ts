@@ -1,50 +1,58 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { prisma } from "@/lib/prisma";
 
-const filePath = path.join(process.cwd(), "data", "gallery.json");
-
-// 🔹 READ
+// 🔹 GET gallery
 export async function GET() {
     try {
-        if (!fs.existsSync(filePath)) {
-            return NextResponse.json({ data: [] });
-        }
+        const items = await prisma.galleryItem.findMany({
+            orderBy: { position: "asc" },
+        });
 
-        const raw = fs.readFileSync(filePath, "utf-8");
-        const json = JSON.parse(raw);
+        return NextResponse.json({
+            data: items,
+        });
 
-        return NextResponse.json(json);
     } catch (err) {
         console.error("GET gallery error:", err);
+
         return NextResponse.json({ data: [] });
     }
 }
 
-// 🔹 WRITE
+// 🔹 SAVE gallery
 export async function POST(req: Request) {
     try {
         const body = await req.json();
 
         if (!body || !body.data) {
-            return NextResponse.json({ ok: false, error: "Invalid payload" });
+            return NextResponse.json({
+                ok: false,
+                error: "Invalid payload",
+            });
         }
 
-        // ensure folder exists
-        const dir = path.dirname(filePath);
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-        }
+        const items = body.data;
 
-        fs.writeFileSync(
-            filePath,
-            JSON.stringify({ data: body.data }, null, 2),
-            "utf-8"
-        );
+        // 🔥 clear existing
+        await prisma.galleryItem.deleteMany();
+
+        // 🔥 rebuild
+        const formatted = items.map((item: any, index: number) => ({
+            imageUrl: item.imageUrl,
+            category: item.category || "general",
+            type: item.type || "single",
+            position: index,
+        }));
+
+        await prisma.galleryItem.createMany({
+            data: formatted,
+        });
 
         return NextResponse.json({ ok: true });
+
     } catch (err) {
         console.error("POST gallery error:", err);
+
         return NextResponse.json({ ok: false });
     }
 }

@@ -1,42 +1,77 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { prisma } from "@/lib/prisma";
 
-const FILE_PATH = path.join(
-    process.cwd(),
-    "data",
-    "pricing.json"
-);
-
-function readData() {
+// GET → return pricing in SAME SHAPE your UI expects
+export async function GET() {
     try {
-        return JSON.parse(fs.readFileSync(FILE_PATH, "utf-8"));
-    } catch {
-        return { services: [], addons: [] };
+        const data = await prisma.pricing.findMany({
+            orderBy: { order: "asc" },
+        });
+
+        const services = data
+            .filter((item) => item.type === "service")
+            .map((item) => ({
+                name: item.name,
+                price: item.price,
+            }));
+
+        const addons = data
+            .filter((item) => item.type === "addon")
+            .map((item) => ({
+                name: item.name,
+                price: item.price,
+            }));
+
+        return NextResponse.json({
+            ok: true,
+            data: { services, addons },
+        });
+
+    } catch (err) {
+        console.error("❌ FETCH PRICING ERROR:", err);
+
+        return NextResponse.json(
+            { ok: false },
+            { status: 500 }
+        );
     }
 }
 
-function writeData(data: any) {
-    fs.writeFileSync(FILE_PATH, JSON.stringify(data, null, 2), "utf-8");
-}
-
-export async function GET() {
-    const data = readData();
-    return NextResponse.json({ ok: true, data });
-}
-
+// POST → save pricing
 export async function POST(req: Request) {
     try {
         const body = await req.json();
+        const { services, addons } = body;
 
-        writeData(body);
+        // 🔥 CLEAR OLD DATA
+        await prisma.pricing.deleteMany();
+
+        // 🔥 REBUILD WITH ORDER
+        const serviceData = services.map((s: any, index: number) => ({
+            type: "service",
+            name: s.name,
+            price: parseFloat(s.price),
+            order: index,
+        }));
+
+        const addonData = addons.map((a: any, index: number) => ({
+            type: "addon",
+            name: a.name,
+            price: parseFloat(a.price),
+            order: index,
+        }));
+
+        await prisma.pricing.createMany({
+            data: [...serviceData, ...addonData],
+        });
 
         return NextResponse.json({
             ok: true,
             message: "Pricing updated",
         });
+
     } catch (err) {
-        console.error("❌ PRICING ERROR:", err);
+        console.error("❌ SAVE PRICING ERROR:", err);
 
         return NextResponse.json(
             { ok: false, message: "Failed to update pricing" },

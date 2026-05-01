@@ -59,7 +59,14 @@ export async function POST(req: Request) {
         const formatted = items.flatMap((section: any) =>
             (section.items || []).map((item: any) => {
                 const record = {
-                    imageUrl: item.image || item.after || item.beforeAfter || "", // 🔥 FIX MAPPING
+                    imageUrl:
+                        item.image ||
+                        item.imageUrl ||
+                        item.url ||
+                        item.src ||
+                        item.after ||
+                        item.beforeAfter ||
+                        "", // 🔥 FIX MAPPING
                     category: section.category || "general",
                     type: item.type || "single",
                     position: position++,

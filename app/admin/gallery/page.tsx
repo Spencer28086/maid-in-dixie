@@ -3,11 +3,7 @@
 import { useEffect, useState } from "react";
 
 type GalleryItem = {
-    type?: "single" | "pair" | "combined";
     image?: string;
-    before?: string;
-    after?: string;
-    beforeAfter?: string;
 };
 
 type GallerySection = {
@@ -26,8 +22,13 @@ export default function GalleryAdminPage() {
             .then((data) => {
                 const normalized = (data.data || []).map((s: any) => ({
                     category: s.category || "Uncategorized",
-                    items: Array.isArray(s.items) ? s.items : [],
+                    items: Array.isArray(s.items)
+                        ? s.items.map((item: any) => ({
+                            image: item.image || "",
+                        }))
+                        : [],
                 }));
+
                 setSections(normalized);
             });
     }, []);
@@ -37,8 +38,17 @@ export default function GalleryAdminPage() {
         await fetch("/api/gallery", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ data: sections }),
+            body: JSON.stringify({
+                data: sections.map((section) => ({
+                    category: section.category,
+                    items: section.items.map((item) => ({
+                        type: "single",
+                        image: item.image,
+                    })),
+                })),
+            }),
         });
+
         alert("Saved");
     }
 
@@ -64,7 +74,7 @@ export default function GalleryAdminPage() {
     // ITEM ACTIONS
     function addItem(sectionIndex: number) {
         const updated = [...sections];
-        updated[sectionIndex].items.push({ type: "single" });
+        updated[sectionIndex].items.push({});
         setSections(updated);
     }
 
@@ -85,24 +95,10 @@ export default function GalleryAdminPage() {
         setSections(updated);
     }
 
-    function changeType(
-        sectionIndex: number,
-        itemIndex: number,
-        type: "single" | "pair" | "combined"
-    ) {
-        const updated = [...sections];
-        updated[sectionIndex].items[itemIndex] = {
-            ...updated[sectionIndex].items[itemIndex],
-            type,
-        };
-        setSections(updated);
-    }
-
     // UPLOAD
     async function upload(
         sectionIndex: number,
         itemIndex: number,
-        field: string,
         file: File
     ) {
         const fd = new FormData();
@@ -116,9 +112,8 @@ export default function GalleryAdminPage() {
         const data = await res.json();
         if (!data.ok) return alert("Upload failed");
 
-        const imageUrl = data.files[0];
+        const imageUrl = data.files?.[0] || data.url || data.file || "";
 
-        // 🔥 IMPORTANT: USE FUNCTIONAL STATE UPDATE
         setSections((prev) => {
             const updated = [...prev];
 
@@ -128,8 +123,7 @@ export default function GalleryAdminPage() {
             };
 
             updated[sectionIndex].items[itemIndex] = {
-                ...updated[sectionIndex].items[itemIndex],
-                [field]: imageUrl,
+                image: imageUrl,
             };
 
             return updated;
@@ -176,68 +170,37 @@ export default function GalleryAdminPage() {
 
                         {/* ITEMS */}
                         <div className="grid md:grid-cols-2 gap-4">
-
                             {section.items.map((item, j) => (
                                 <div key={j} className="border p-3 rounded space-y-2">
 
-                                    {/* TYPE SELECT */}
-                                    <select
-                                        value={item.type || "single"}
+                                    {item.image && (
+                                        <img
+                                            src={item.image}
+                                            className="h-32 w-full object-cover"
+                                        />
+                                    )}
+
+                                    <input
+                                        type="file"
                                         onChange={(e) =>
-                                            changeType(
-                                                i,
-                                                j,
-                                                e.target.value as "single" | "pair" | "combined"
-                                            )
+                                            e.target.files &&
+                                            upload(i, j, e.target.files[0])
                                         }
-                                        className="border p-1 w-full"
-                                    >
-                                        <option value="single">Single Image</option>
-                                        <option value="pair">Before / After</option>
-                                        <option value="combined">Combined</option>
-                                    </select>
+                                    />
 
-                                    {/* SINGLE */}
-                                    {item.type === "single" && (
-                                        <>
-                                            {item.image && <img src={item.image} className="h-32 w-full object-cover" />}
-                                            <input type="file" onChange={(e) => e.target.files && upload(i, j, "image", e.target.files[0])} />
-                                        </>
-                                    )}
-
-                                    {/* PAIR */}
-                                    {item.type === "pair" && (
-                                        <>
-                                            <div className="grid grid-cols-2 gap-2">
-                                                {item.before && <img src={item.before} className="h-24 object-cover" />}
-                                                {item.after && <img src={item.after} className="h-24 object-cover" />}
-                                            </div>
-
-                                            <input type="file" onChange={(e) => e.target.files && upload(i, j, "before", e.target.files[0])} />
-                                            <input type="file" onChange={(e) => e.target.files && upload(i, j, "after", e.target.files[0])} />
-                                        </>
-                                    )}
-
-                                    {/* COMBINED */}
-                                    {item.type === "combined" && (
-                                        <>
-                                            {item.beforeAfter && <img src={item.beforeAfter} className="h-32 w-full object-cover" />}
-                                            <input type="file" onChange={(e) => e.target.files && upload(i, j, "beforeAfter", e.target.files[0])} />
-                                        </>
-                                    )}
-
-                                    {/* CONTROLS */}
                                     <div className="flex justify-between text-sm">
                                         <button onClick={() => moveItem(i, j, -1)}>↑</button>
                                         <button onClick={() => moveItem(i, j, 1)}>↓</button>
-                                        <button onClick={() => deleteItem(i, j)} className="text-red-500">
+                                        <button
+                                            onClick={() => deleteItem(i, j)}
+                                            className="text-red-500"
+                                        >
                                             Delete
                                         </button>
                                     </div>
 
                                 </div>
                             ))}
-
                         </div>
 
                         <button

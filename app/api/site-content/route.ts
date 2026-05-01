@@ -1,53 +1,51 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { prisma } from "@/lib/prisma";
 
-const FILE_PATH = path.join(
-    process.cwd(),
-    "data",
-    "site-content.json"
-);
-
-function readData() {
-    try {
-        return JSON.parse(fs.readFileSync(FILE_PATH, "utf-8"));
-    } catch {
-        return {};
-    }
-}
-
-function writeData(data: any) {
-    try {
-        console.log("💾 WRITING SITE CONTENT TO:", FILE_PATH);
-        console.log("📦 DATA:", data);
-
-        fs.writeFileSync(FILE_PATH, JSON.stringify(data, null, 2), "utf-8");
-
-        console.log("✅ WRITE SUCCESS");
-    } catch (err) {
-        console.error("❌ WRITE FAILED:", err);
-        throw err;
-    }
-}
-
+// GET SITE CONTENT
 export async function GET() {
-    const data = readData();
-    return NextResponse.json({ ok: true, data });
+    try {
+        const content = await prisma.siteContent.findUnique({
+            where: { id: "main" },
+        });
+
+        return NextResponse.json({
+            ok: true,
+            data: content,
+        });
+    } catch (err) {
+        console.error("❌ FETCH CONTENT ERROR:", err);
+
+        return NextResponse.json(
+            { ok: false },
+            { status: 500 }
+        );
+    }
 }
 
+// SAVE SITE CONTENT
 export async function POST(req: Request) {
     try {
         const body = await req.json();
 
         console.log("📥 RECEIVED CONTENT UPDATE:", body);
 
-        writeData(body);
+        const updated = await prisma.siteContent.upsert({
+            where: { id: "main" },
+            update: body,
+            create: {
+                id: "main",
+                ...body,
+            },
+        });
+
+        console.log("✅ DB WRITE SUCCESS");
 
         return NextResponse.json({
             ok: true,
             message: "Content updated",
-            data: body,
+            data: updated,
         });
+
     } catch (err) {
         console.error("❌ SITE CONTENT ERROR:", err);
 

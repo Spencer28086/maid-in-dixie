@@ -1,41 +1,55 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
-
-const filePath = path.join(process.cwd(), "data", "availability.json");
-
-function readData() {
-  try {
-    const json = fs.readFileSync(filePath, "utf-8");
-    return JSON.parse(json || "{}");
-  } catch {
-    return {};
-  }
-}
-
-function writeData(data: any) {
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-}
+import { prisma } from "@/lib/prisma";
 
 // GET → return availability
 export async function GET() {
-  const data = readData();
-  return NextResponse.json(data);
+  try {
+    const data = await prisma.availability.findMany();
+
+    // convert array → object like your frontend expects
+    const formatted: Record<string, any> = {};
+
+    data.forEach((item) => {
+      formatted[item.date] = {
+        status: item.status,
+        slots: item.slots,
+      };
+    });
+
+    return NextResponse.json(formatted);
+  } catch (err) {
+    console.error("❌ FETCH AVAILABILITY ERROR:", err);
+
+    return NextResponse.json({}, { status: 500 });
+  }
 }
 
-// 🔥 UPDATED POST (NOW SUPPORTS SLOTS)
+// POST → save availability
 export async function POST(req: Request) {
-  const body = await req.json();
-  const { date, status, slots } = body;
+  try {
+    const body = await req.json();
+    const { date, status, slots } = body;
 
-  const data = readData();
+    await prisma.availability.upsert({
+      where: { date },
+      update: {
+        status,
+        slots: slots || [],
+      },
+      create: {
+        date,
+        status,
+        slots: slots || [],
+      },
+    });
 
-  data[date] = {
-    status,
-    slots: slots || [],
-  };
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("❌ SAVE AVAILABILITY ERROR:", err);
 
-  writeData(data);
-
-  return NextResponse.json({ success: true });
+    return NextResponse.json(
+      { success: false },
+      { status: 500 }
+    );
+  }
 }

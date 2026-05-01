@@ -71,3 +71,11 @@ model SiteContent {
   city         String
   updatedAt    DateTime @updatedAt
 }
+
+model Availability {
+  id        String   @id @default(cuid())
+  date      String   @unique
+  status    String
+  slots     String[]
+  updatedAt DateTime @updatedAt
+}

@@ -27,13 +27,28 @@ export default function Header() {
           <div className="flex items-center justify-between">
 
             {/* LOGO */}
-            <Link href="/" className="flex flex-col leading-tight">
-              <span className="font-serif text-lg sm:text-xl text-[#2f2928]">
-                Maid in Dixie
-              </span>
-              <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.3em] text-[#c77b95]">
-                Cleaning Services
-              </span>
+            <Link href="/" className="flex items-center gap-3">
+
+              {/* ICON */}
+              <div className="w-10 h-10 rounded-full bg-[#f7cfd8] flex items-center justify-center text-lg">
+
+              </div>
+
+              {/* TEXT LOGO */}
+              <div className="flex flex-col leading-tight">
+                <span className="font-serif text-lg sm:text-xl text-[#d95f91]">
+                  Maid in Dixie
+                </span>
+
+                <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.3em] text-[#c77b95]">
+                  Cleaning Services
+                </span>
+
+                <span className="text-[9px] sm:text-[10px] italic text-[#b87a8f]">
+                  Sparkle with a Southern Touch
+                </span>
+              </div>
+
             </Link>
 
             {/* BUTTONS */}

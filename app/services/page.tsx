@@ -14,22 +14,24 @@ type Service = {
 
 export default function ServicesPage() {
     const [core, setCore] = useState<Service[]>([]);
+    const [addons, setAddons] = useState<string[]>([]);
 
     useEffect(() => {
         fetch("/api/pricing")
             .then((res) => res.json())
             .then((data) => {
                 setCore(data.data?.services || []);
+                setAddons(data.data?.addons || []); // ✅ NEW
             });
     }, []);
 
     return (
         <main className="min-h-screen bg-[#fff7f8] px-6 py-16">
-            <div className="max-w-6xl mx-auto space-y-20">
+            <div className="max-w-7xl mx-auto space-y-24">
 
                 {/* HEADER */}
                 <div className="text-center space-y-4">
-                    <h1 className="text-4xl font-serif text-[#2b1c1f]">
+                    <h1 className="text-5xl font-serif text-[#2b1c1f]">
                         Our Services
                     </h1>
                     <p className="text-gray-600 max-w-xl mx-auto">
@@ -39,16 +41,16 @@ export default function ServicesPage() {
                 </div>
 
                 {/* CORE SERVICES */}
-                <section className="space-y-8">
-                    <h2 className="text-2xl font-serif text-[#4b332c]">
+                <section className="space-y-10">
+                    <h2 className="text-3xl font-serif text-[#4b332c] text-center">
                         Core Cleaning Services
                     </h2>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {core.map((service, i) => (
                             <div
                                 key={i}
-                                className="bg-white rounded-2xl shadow-lg border border-[#f3d1d8] overflow-hidden"
+                                className="bg-white rounded-2xl shadow-lg border border-[#f3d1d8] overflow-hidden hover:shadow-xl transition"
                             >
                                 {service.image && (
                                     <img
@@ -58,13 +60,14 @@ export default function ServicesPage() {
                                 )}
 
                                 <div className="p-6 space-y-4">
+
                                     <div className="text-sm text-[#d95f91] font-semibold">
                                         {service.customQuote
                                             ? "Custom Quote Required"
                                             : `Starting at $${service.price}+`}
                                     </div>
 
-                                    <h3 className="text-xl font-serif text-[#2b1c1f]">
+                                    <h3 className="text-lg font-serif text-[#2b1c1f]">
                                         {service.name}
                                     </h3>
 
@@ -84,20 +87,20 @@ export default function ServicesPage() {
                                     >
                                         Book This Service
                                     </Link>
+
                                 </div>
                             </div>
                         ))}
                     </div>
                 </section>
 
-                {/* RECURRING SERVICES */}
-                <section className="space-y-8">
-                    <h2 className="text-2xl font-serif text-[#4b332c]">
+                {/* RECURRING */}
+                <section className="space-y-10">
+                    <h2 className="text-3xl font-serif text-[#4b332c] text-center">
                         Recurring Cleaning Plans
                     </h2>
 
                     <div className="grid md:grid-cols-3 gap-6">
-
                         {[
                             {
                                 name: "Weekly Cleaning",
@@ -117,7 +120,7 @@ export default function ServicesPage() {
                         ].map((item, i) => (
                             <div
                                 key={i}
-                                className="bg-white p-6 rounded-xl border shadow-md text-center space-y-3"
+                                className="bg-white p-6 rounded-xl border shadow-md text-center space-y-3 hover:shadow-lg transition"
                             >
                                 <h3 className="font-serif text-lg text-[#2b1c1f]">
                                     {item.name}
@@ -139,48 +142,44 @@ export default function ServicesPage() {
                                 </Link>
                             </div>
                         ))}
-
                     </div>
                 </section>
 
-                {/* ADD-ONS */}
-                <section className="space-y-8">
-                    <h2 className="text-2xl font-serif text-[#4b332c]">
+                {/* ADD-ONS (DYNAMIC) */}
+                <section className="space-y-10">
+                    <h2 className="text-3xl font-serif text-[#4b332c] text-center">
                         Add-On Services
                     </h2>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+                    <div className="flex flex-wrap justify-center gap-4">
 
-                        {[
-                            "Inside Oven Cleaning: $25–$50",
-                            "Steam Clean Oven: $50+",
-                            "Inside Refrigerator: $25–$40",
-                            "Steam Refrigerator: $40+",
-                            "Dishes: $15+",
-                            "Laundry (3 loads): $25+",
-                            "Extra Laundry Load: $7",
-                            "Animal Crate Cleaning: $20+",
-                            "Interior Windows: $5 per window",
-                            "Baseboards Deep Clean: $25+",
-                            "Blind Cleaning: $20+",
-                            "Organization: $30/hr (2hr min)",
-                            "Holiday Decor Setup: $50+",
-                            "Holiday Decor Takedown: $50+",
-                            "Christmas Tree Setup: $75+",
-                            "Date Night Setup: $80+",
-                        ].map((addon, i) => (
-                            <div
-                                key={i}
-                                className="bg-white p-4 rounded-lg border shadow-sm"
-                            >
-                                {addon}
-                            </div>
-                        ))}
+                        {addons.map((addon: any, i) => {
+                            const isObject = typeof addon === "object";
+
+                            return (
+                                <div
+                                    key={i}
+                                    className="bg-white border border-[#f3d1d8] px-5 py-3 rounded-full shadow-sm text-sm text-[#2b1c1f] hover:shadow-md transition flex items-center gap-2"
+                                >
+                                    <span>{isObject ? addon.name : addon}</span>
+
+                                    {isObject && addon.price && (
+                                        <span className="text-[#d95f91] font-semibold">
+                                            {typeof addon.price === "number"
+                                                ? `$${addon.price}`
+                                                : addon.price?.toString().startsWith("$")
+                                                    ? addon.price
+                                                    : `$${addon.price}`}
+                                        </span>
+                                    )}
+                                </div>
+                            );
+                        })}
 
                     </div>
                 </section>
 
-                {/* PRICING DISCLAIMER */}
+                {/* DISCLAIMER */}
                 <section className="bg-white border border-[#f3d1d8] p-6 rounded-xl text-sm text-gray-600">
                     <strong className="text-[#2b1c1f]">
                         Pricing Notice:

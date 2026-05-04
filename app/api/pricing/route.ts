@@ -50,14 +50,14 @@ export async function POST(req: Request) {
         const serviceData = services.map((s: any, index: number) => ({
             type: "service",
             name: s.name,
-            price: parseFloat(s.price),
+            price: s.price,
             order: index,
         }));
 
         const addonData = addons.map((a: any, index: number) => ({
             type: "addon",
             name: a.name,
-            price: parseFloat(a.price),
+            price: a.price,
             order: index,
         }));
 

@@ -77,7 +77,7 @@ model Pricing {
   id        String   @id @default(cuid())
   type      String   // "service" or "addon"
   name      String
-  price     Float
+  price     String
   order     Int
   updatedAt DateTime @updatedAt
 }

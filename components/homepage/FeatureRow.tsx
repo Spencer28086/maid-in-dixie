@@ -32,13 +32,21 @@ export default function FeatureRow() {
   return (
     <section className="relative py-24 overflow-hidden">
 
-      {/* 🌸 Soft pink background wash (slightly deeper for contrast) */}
-      <div className="absolute inset-0 bg-[#fbe4eb]" />
+      {/* BACKGROUND (FORCED BEHIND EVERYTHING) */}
+      <div className="absolute inset-0 bg-[#fbe4eb] z-0" />
 
-      {/* ✨ subtle glow */}
-      <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#f7d6dc]/40 blur-3xl rounded-full" />
+      {/* GLOW */}
+      <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#f7d6dc]/40 blur-3xl rounded-full z-0" />
 
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
+      {/* COWGIRL (FORCED ABOVE BACKGROUND) */}
+      <img
+        src="/cowgirl.png"
+        className="pointer-events-none absolute left-10 top-1/2 -translate-y-1/2 w-[320px] opacity-90 hidden lg:block z-20"
+        alt=""
+      />
+
+      {/* CONTENT */}
+      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-10">
 
         {/* Heading */}
         <div className="text-center mb-16">
@@ -63,7 +71,7 @@ export default function FeatureRow() {
                 className="group relative flex flex-col items-center px-4 transition-all duration-300 hover:-translate-y-2"
               >
 
-                {/* ✨ Glass Icon Bubble (UPDATED HERE) */}
+                {/* Icon Bubble */}
                 <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-white/90 backdrop-blur border border-[#e8aab5]/60 shadow-md group-hover:shadow-xl transition-all duration-300">
 
                   <Icon
@@ -83,7 +91,7 @@ export default function FeatureRow() {
                   {feature.desc}
                 </p>
 
-                {/* ✨ Hover glow */}
+                {/* Hover Glow */}
                 <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-500 pointer-events-none bg-gradient-to-b from-[#f7d6dc]/20 to-transparent blur-xl" />
 
               </div>

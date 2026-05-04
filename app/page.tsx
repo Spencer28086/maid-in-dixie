@@ -17,8 +17,6 @@ export default function Home() {
         <Hero />
       </section>
 
-      <FloatingCowgirl />
-
       <SectionWave />
 
       <FeatureRow />

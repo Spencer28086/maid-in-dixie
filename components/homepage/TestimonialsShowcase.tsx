@@ -37,6 +37,13 @@ export default function TestimonialsShowcase() {
   return (
     <section className="relative bg-[#fff1f4] py-32 px-6 overflow-hidden">
 
+      {/* COWGIRL */}
+      <img
+        src="/cowgirl.png"
+        className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 w-[300px] opacity-80 hidden lg:block"
+        alt=""
+      />
+
       <div className="absolute -top-24 right-0 w-[400px] h-[400px] bg-[#f7d6dc]/40 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#e8cfc3]/30 rounded-full blur-3xl" />
 

@@ -38,6 +38,13 @@ export default function PricingPreview() {
 
   return (
     <section className="relative py-24 px-6">
+
+      {/* COWGIRL */}
+      <img
+        src="/cowgirl.png"
+        className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 w-[300px] opacity-80 hidden lg:block"
+        alt=""
+      />
       {/* BACKGROUND GLOW */}
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#fff1f5] via-white to-white" />
 

@@ -33,6 +33,12 @@ export default function ServicesSection() {
 
   return (
     <section className="relative py-28 overflow-hidden">
+      {/* COWGIRL */}
+      <img
+        src="/cowgirl.png"
+        className="pointer-events-none absolute left-[-40px] top-1/2 -translate-y-1/2 w-[280px] opacity-90"
+        alt=""
+      />
       <div className="absolute inset-0 bg-[#fff1f4]" />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-10 grid lg:grid-cols-2 gap-20 items-center">

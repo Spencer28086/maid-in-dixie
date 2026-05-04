@@ -20,21 +20,35 @@ export default function Calendar({ availability, onSelect }: CalendarProps) {
                 const key = format(date, "yyyy-MM-dd");
                 const dayData = availability?.[key];
 
-                const isDisabled = dayData?.status === "FULL";
+                // ✅ NEW: SLOT CHECK
+                const hasSlots = Array.isArray(dayData?.slots) && dayData.slots.length > 0;
+
+                // ✅ UPDATED: DISABLE LOGIC
+                const isDisabled = dayData?.status === "FULL" || !hasSlots;
 
                 return (
                     <button
                         key={key}
-                        onClick={() => !isDisabled && onSelect(date)}
+                        onClick={() => {
+                            if (isDisabled) return;
+                            onSelect(date);
+                        }}
                         disabled={isDisabled}
-                        className={`p-4 rounded-xl border text-sm font-medium
-              ${isDisabled
-                                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                        className={`relative p-4 rounded-xl border text-sm font-medium
+                            ${isDisabled
+                                ? "bg-gray-200 text-gray-500 cursor-not-allowed opacity-60"
                                 : "bg-white hover:bg-[#fdf2f5] border-[#f3d1d8]"
                             }
-            `}
+                        `}
                     >
                         <div>{format(date, "MMM d")}</div>
+
+                        {/* ✅ UNAVAILABLE LABEL */}
+                        {isDisabled && (
+                            <div className="text-[10px] mt-1 text-gray-500">
+                                Unavailable
+                            </div>
+                        )}
                     </button>
                 );
             })}

@@ -49,7 +49,6 @@ export default function AdminCalendarPage() {
     setSlots(day?.slots || []);
 
     const dayBookings = bookings.filter((b) => b.selectedDate === key);
-
     setSelectedDayBookings(dayBookings);
   }
 
@@ -95,7 +94,6 @@ export default function AdminCalendarPage() {
 
     await loadData();
 
-    // 🔥 Re-fetch fresh bookings to avoid stale state
     if (selectedDate) {
       const res = await fetch("/api/booking", { cache: "no-store" });
       const data = await res.json();
@@ -139,6 +137,8 @@ export default function AdminCalendarPage() {
 
           const isBooked = dayData?.status === "booked";
 
+          const isUnavailable = slotCount === 0;
+
           let bg = "bg-white text-gray-800";
 
           if (hasApproved) bg = "bg-red-300 text-red-900";
@@ -152,9 +152,11 @@ export default function AdminCalendarPage() {
               key={key}
               onClick={() => !isBooked && selectDay(day)}
               disabled={isBooked}
-              className={`relative py-2 rounded-lg border
+              className={`
+                relative py-2 rounded-lg border
                 ${bg}
                 ${isBooked ? "bg-red-400 text-white cursor-not-allowed opacity-70" : "hover:shadow"}
+                ${isUnavailable && !isSelected ? "opacity-50" : ""}
               `}
             >
               {format(day, "d")}
@@ -163,6 +165,13 @@ export default function AdminCalendarPage() {
               {slotCount > 0 && !isSelected && (
                 <span className="absolute bottom-1 right-1 text-xs bg-white px-1 rounded">
                   {slotCount}
+                </span>
+              )}
+
+              {/* UNAVAILABLE LABEL */}
+              {isUnavailable && !isSelected && !isBooked && (
+                <span className="absolute bottom-1 left-1 text-[10px] bg-gray-200 text-gray-600 px-1 rounded">
+                  Unavailable
                 </span>
               )}
 
@@ -175,7 +184,7 @@ export default function AdminCalendarPage() {
         })}
       </div>
 
-      {/* DAY EDITOR (DISABLED FOR BOOKED DAYS) */}
+      {/* DAY EDITOR */}
       {selectedDate && availability[selectedDate]?.status !== "booked" && (
         <div className="border p-6 rounded-xl bg-white shadow">
           <h2 className="mb-4 font-bold">{selectedDate}</h2>

@@ -27,12 +27,15 @@ export default function Header() {
           <div className="flex items-center justify-between">
 
             {/* LOGO */}
-            <Link href="/" className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-4">
 
               {/* ICON */}
-              <div className="w-10 h-10 rounded-full bg-[#f7cfd8] flex items-center justify-center text-lg">
-
-              </div>
+              {/* LOGO IMAGE */}
+              <img
+                src="/logo-head.png"
+                alt="Maid in Dixie Logo"
+                className="w-14 h-14 object-contain rounded-full border border-[#f1d4db] shadow-sm"
+              />
 
               {/* TEXT LOGO */}
               <div className="flex flex-col leading-tight">

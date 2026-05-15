@@ -86,7 +86,9 @@ export default function ServicesPage() {
                                     <div className="text-sm text-[#d95f91] font-semibold">
                                         {service.customQuote
                                             ? "Custom Quote Required"
-                                            : `Starting at $${service.price}+`}
+                                            : service.price
+                                                ? `Starting at $${service.price}+`
+                                                : null}
                                     </div>
 
                                     <h3 className="text-lg font-serif text-[#2b1c1f]">

@@ -115,10 +115,14 @@ model TikTokVideo {
 }
 
 model ServiceItem {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  price       Float?
-  position    Int
-  createdAt   DateTime @default(now())
+  id           String   @id @default(cuid())
+  name         String
+  subtitle     String?
+  description  String?
+  features     String[]
+  image        String?
+  customQuote  Boolean  @default(false)
+  price        String?
+  position     Int
+  createdAt    DateTime @default(now())
 }

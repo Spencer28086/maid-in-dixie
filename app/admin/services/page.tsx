@@ -141,6 +141,8 @@ export default function ServicesAdminPage() {
                 {/* SERVICES (unchanged) */}
                 {services.map((service, i) => (
                     <div key={i} className="border p-6 rounded-2xl space-y-4">
+
+                        {/* TITLE */}
                         <input
                             value={service.title}
                             onChange={(e) =>
@@ -154,6 +156,35 @@ export default function ServicesAdminPage() {
                             className="w-full border p-2 rounded"
                         />
 
+                        {/* SUBTITLE */}
+                        <input
+                            value={service.subtitle}
+                            onChange={(e) =>
+                                setServices((prev) => {
+                                    const updated = [...prev];
+                                    updated[i].subtitle = e.target.value;
+                                    return updated;
+                                })
+                            }
+                            placeholder="Subtitle"
+                            className="w-full border p-2 rounded"
+                        />
+
+                        {/* DESCRIPTION */}
+                        <textarea
+                            value={service.description}
+                            onChange={(e) =>
+                                setServices((prev) => {
+                                    const updated = [...prev];
+                                    updated[i].description = e.target.value;
+                                    return updated;
+                                })
+                            }
+                            placeholder="Description"
+                            className="w-full border p-2 rounded min-h-[120px]"
+                        />
+
+                        {/* PRICE */}
                         <input
                             value={service.price}
                             onChange={(e) =>
@@ -166,6 +197,120 @@ export default function ServicesAdminPage() {
                             placeholder="Price"
                             className="w-full border p-2 rounded"
                         />
+
+                        {/* FEATURES */}
+                        <div className="space-y-2">
+                            <label className="font-medium text-sm">
+                                Features
+                            </label>
+
+                            {service.features.map((feature, featureIndex) => (
+                                <input
+                                    key={featureIndex}
+                                    value={feature}
+                                    onChange={(e) =>
+                                        setServices((prev) => {
+                                            const updated = [...prev];
+                                            updated[i].features[featureIndex] = e.target.value;
+                                            return updated;
+                                        })
+                                    }
+                                    placeholder={`Feature ${featureIndex + 1}`}
+                                    className="w-full border p-2 rounded"
+                                />
+                            ))}
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setServices((prev) => {
+                                        const updated = [...prev];
+                                        updated[i].features.push("");
+                                        return updated;
+                                    })
+                                }
+                                className="text-pink-600 text-sm font-semibold"
+                            >
+                                + Add Feature
+                            </button>
+                        </div>
+
+                        {/* IMAGE PREVIEW */}
+                        {service.image && (
+                            <img
+                                src={service.image}
+                                alt={service.title}
+                                className="w-full max-w-md h-48 object-cover rounded-xl border"
+                            />
+                        )}
+
+                        {/* IMAGE URL */}
+                        <input
+                            value={service.image}
+                            onChange={(e) =>
+                                setServices((prev) => {
+                                    const updated = [...prev];
+                                    updated[i].image = e.target.value;
+                                    return updated;
+                                })
+                            }
+                            placeholder="Image URL"
+                            className="w-full border p-2 rounded"
+                        />
+
+                        {/* HIDDEN FILE INPUT */}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            ref={(el) => {
+                                fileInputRefs.current[i] = el;
+                            }}
+                            className="hidden"
+                            onChange={async (e) => {
+                                const file = e.target.files?.[0];
+
+                                if (!file) return;
+
+                                try {
+                                    const formData = new FormData();
+                                    formData.append("files", file);
+
+                                    const res = await fetch("/api/upload", {
+                                        method: "POST",
+                                        body: formData,
+                                    });
+
+                                    const data = await res.json();
+
+                                    if (!data.ok || !data.files?.[0]) {
+                                        alert("Upload failed");
+                                        return;
+                                    }
+
+                                    const uploadedUrl = data.files[0];
+
+                                    setServices((prev) => {
+                                        const updated = [...prev];
+                                        updated[i].image = uploadedUrl;
+                                        return updated;
+                                    });
+
+                                } catch (err) {
+                                    console.error("Upload error:", err);
+                                    alert("Upload failed");
+                                }
+                            }}
+                        />
+
+                        {/* UPLOAD BUTTON */}
+                        <button
+                            type="button"
+                            onClick={() => fileInputRefs.current[i]?.click()}
+                            className="bg-[#d95f91] text-white px-4 py-2 rounded-lg"
+                        >
+                            Upload Image
+                        </button>
+
                     </div>
                 ))}
 

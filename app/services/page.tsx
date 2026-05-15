@@ -17,12 +17,34 @@ export default function ServicesPage() {
     const [addons, setAddons] = useState<string[]>([]);
 
     useEffect(() => {
-        fetch("/api/pricing")
-            .then((res) => res.json())
-            .then((data) => {
-                setCore(data.data?.services || []);
-                setAddons(data.data?.addons || []); // ✅ NEW
-            });
+        async function loadData() {
+            try {
+                const [servicesRes, pricingRes] = await Promise.all([
+                    fetch("/api/services"),
+                    fetch("/api/pricing"),
+                ]);
+
+                const servicesData = await servicesRes.json();
+                const pricingData = await pricingRes.json();
+
+                setCore(
+                    Array.isArray(servicesData.data)
+                        ? servicesData.data
+                        : []
+                );
+
+                setAddons(
+                    Array.isArray(pricingData.data?.addons)
+                        ? pricingData.data.addons
+                        : []
+                );
+
+            } catch (err) {
+                console.error("Services page load error:", err);
+            }
+        }
+
+        loadData();
     }, []);
 
     return (

@@ -23,11 +23,82 @@ export default function ServicesSection() {
   const getServiceImage = (name: string) => {
     const n = name?.toLowerCase() || "";
 
-    if (n.includes("standard")) return "/images/services/standard-cleaning.jpg";
-    if (n.includes("deep")) return "/images/services/deep-cleaning.jpg";
-    if (n.includes("move")) return "/images/services/move-cleaning.jpg";
-    if (n.includes("rv")) return "/images/services/rv-cleaning.jpg";
+    // STANDARD / BASIC
+    if (
+      n.includes("standard") ||
+      n.includes("basic") ||
+      n.includes("regular") ||
+      n.includes("routine")
+    ) {
+      return "/images/services/standard-cleaning.jpg";
+    }
 
+    // DEEP CLEANING
+    if (
+      n.includes("deep") ||
+      n.includes("detailed") ||
+      n.includes("intensive")
+    ) {
+      return "/images/services/deep-cleaning.jpg";
+    }
+
+    // MOVE-IN / MOVE-OUT
+    if (
+      n.includes("move") ||
+      n.includes("move-in") ||
+      n.includes("move-out") ||
+      n.includes("vacant")
+    ) {
+      return "/images/services/move-cleaning.jpg";
+    }
+
+    // AIRBNB / VACATION RENTAL
+    if (
+      n.includes("airbnb") ||
+      n.includes("vacation") ||
+      n.includes("rental") ||
+      n.includes("turnover")
+    ) {
+      return "/images/services/airbnb-cleaning.jpg";
+    }
+
+    // RV / CAMPER
+    if (
+      n.includes("rv") ||
+      n.includes("camper") ||
+      n.includes("motorhome")
+    ) {
+      return "/images/services/rv-cleaning.jpg";
+    }
+
+    // COMMERCIAL
+    if (
+      n.includes("commercial") ||
+      n.includes("office") ||
+      n.includes("business")
+    ) {
+      return "/images/services/commercial-cleaning.jpg";
+    }
+
+    // ORGANIZATION
+    if (
+      n.includes("organization") ||
+      n.includes("organizing") ||
+      n.includes("declutter")
+    ) {
+      return "/images/services/organization.jpg";
+    }
+
+    // LAUNDRY
+    if (
+      n.includes("laundry") ||
+      n.includes("wash") ||
+      n.includes("fold")
+    ) {
+      return "/images/services/laundry.jpg";
+    }
+
+    // DEFAULT
     return "/images/services/standard-cleaning.jpg";
   };
 
